@@ -9,19 +9,20 @@ export default async function AdminLayout({
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/auth/login")
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
+  if (!user) redirect("/admin/login")
+
+  const { data: adminData } = await supabase
+    .from("admin_users")
+    .select("*")
     .eq("id", user.id)
     .single()
 
-  if (!profile || profile.role !== "admin") redirect("/dashboard")
+  if (!adminData) redirect("/admin/login")
 
   return (
     <div className="min-h-screen bg-gray-950">
-      <AdminNavbar />
+      <AdminNavbar adminName={adminData.full_name || adminData.email} />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
