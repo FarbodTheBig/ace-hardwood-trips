@@ -10,11 +10,9 @@ export default async function AdminDashboardPage() {
   const { data: adminData } = await supabase.from("admin_users").select("*").eq("id", user.id).single()
   if (!adminData) redirect("/admin/login")
 
-  // Fetch all trips (admin bypasses RLS via service role — we use a direct query)
   const { data: allTrips } = await supabase.from("trip_sheets").select("*").order("created_at", { ascending: false })
   const trips = allTrips || []
 
-  // Get all users from auth (we store driver info in trip metadata)
   const totalTrips = trips.length
   const totalKm = trips.reduce((sum, t) => sum + (t.total_km || 0), 0)
 
@@ -24,10 +22,10 @@ export default async function AdminDashboardPage() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
   })
 
-  // Unique drivers
-  const uniqueDrivers = [...new Set(trips.map((t) => t.user_id))].length
+  const driverIds: string[] = []
+  trips.forEach((t) => { if (!driverIds.includes(t.user_id)) driverIds.push(t.user_id) })
+  const uniqueDrivers = driverIds.length
 
-  // Top drivers by KM
   const driverMap: Record<string, { name: string; km: number; trips: number }> = {}
   trips.forEach((t) => {
     if (!driverMap[t.user_id]) {
@@ -45,7 +43,6 @@ export default async function AdminDashboardPage() {
         <p className="text-gray-400 text-sm mt-1">Overview of all drivers and trips</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total Drivers", value: uniqueDrivers.toString(), icon: "👷" },
@@ -62,7 +59,6 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Drivers */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-white">Top Drivers by KM</h2>
@@ -78,10 +74,7 @@ export default async function AdminDashboardPage() {
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-gray-200 truncate">{d.name}</div>
                     <div className="mt-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-red-600 rounded-full"
-                        style={{ width: `${(d.km / (topDrivers[0]?.km || 1)) * 100}%` }}
-                      />
+                      <div className="h-full bg-red-600 rounded-full" style={{ width: `${(d.km / (topDrivers[0]?.km || 1)) * 100}%` }} />
                     </div>
                   </div>
                   <span className="text-xs text-gray-400 shrink-0">{d.km.toLocaleString()} km</span>
@@ -91,7 +84,6 @@ export default async function AdminDashboardPage() {
           )}
         </div>
 
-        {/* Recent Trips */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-white">Recent Trips</h2>
