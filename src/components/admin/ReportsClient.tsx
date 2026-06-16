@@ -55,7 +55,7 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
       t.total_km?.toString() || "0",
       t.total_miles?.toString() || "0",
       t.stops?.length?.toString() || "0",
-      (t as Record<string, unknown>).status as string || "pending",
+      (t as unknown as Record<string, string>)["status"] || "pending",
     ])
     const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n")
     const blob = new Blob([csv], { type: "text/csv" })
