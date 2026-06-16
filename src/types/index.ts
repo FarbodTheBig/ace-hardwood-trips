@@ -34,11 +34,18 @@ export interface Profile {
   created_at: string
 }
 
-export interface AnalyticsSummary {
-  total_trips: number
+export interface AdminUser {
+  id: string
+  email: string
+  full_name: string
+  created_at: string
+}
+
+export interface DriverWithStats {
+  id: string
+  email: string
+  full_name: string
+  created_at: string
+  trip_count: number
   total_km: number
-  trips_this_month: number
-  km_this_month: number
-  weekly_km: { week: string; km: number }[]
-  top_routes: { route: string; count: number }[]
 }
