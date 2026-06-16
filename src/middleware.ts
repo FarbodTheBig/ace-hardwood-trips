@@ -26,21 +26,33 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+  const { pathname } = request.nextUrl
 
-  const protectedRoutes = ["/dashboard", "/trip", "/history"]
-  const adminRoutes = ["/admin/dashboard", "/admin/drivers", "/admin/trips"]
-  const isProtected = protectedRoutes.some((r) => request.nextUrl.pathname.startsWith(r))
-  const isAdminRoute = adminRoutes.some((r) => request.nextUrl.pathname.startsWith(r))
+  // Public routes — never redirect these
+  if (
+    pathname === "/auth/login" ||
+    pathname === "/auth/signup" ||
+    pathname === "/admin/login"
+  ) {
+    return supabaseResponse
+  }
 
-  if (!user && isProtected) {
+  // Protected driver routes
+  const driverRoutes = ["/dashboard", "/trip", "/history"]
+  const isDriverRoute = driverRoutes.some((r) => pathname.startsWith(r))
+  if (!user && isDriverRoute) {
     return NextResponse.redirect(new URL("/auth/login", request.url))
   }
 
+  // Protected admin routes
+  const adminRoutes = ["/admin/dashboard", "/admin/drivers", "/admin/trips"]
+  const isAdminRoute = adminRoutes.some((r) => pathname.startsWith(r))
   if (!user && isAdminRoute) {
     return NextResponse.redirect(new URL("/admin/login", request.url))
   }
 
-  if (user && request.nextUrl.pathname === "/") {
+  // Root redirect
+  if (user && pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
