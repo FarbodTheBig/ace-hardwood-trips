@@ -14,11 +14,8 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
   const [filterTo, setFilterTo] = useState("")
   const [filterTruck, setFilterTruck] = useState("")
 
-  const driverNames: string[] = []
-  trips.forEach((t) => { if (t.driver_name && !driverNames.includes(t.driver_name)) driverNames.push(t.driver_name) })
-
-  const truckNumbers: string[] = []
-  trips.forEach((t) => { if (t.truck_number && !truckNumbers.includes(t.truck_number)) truckNumbers.push(t.truck_number) })
+  const drivers = [...new Set(trips.map((t) => t.driver_name).filter(Boolean))]
+  const trucks = [...new Set(trips.map((t) => t.truck_number).filter(Boolean))]
 
   const filtered = trips.filter((t) => {
     const date = new Date(t.created_at)
@@ -35,6 +32,7 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
   const totalKm = filtered.reduce((sum, t) => sum + (t.total_km || 0), 0)
   const totalMiles = filtered.reduce((sum, t) => sum + (t.total_miles || 0), 0)
 
+  // Per driver summary
   const driverSummary: Record<string, { trips: number; km: number }> = {}
   filtered.forEach((t) => {
     const name = t.driver_name || "Unknown"
@@ -55,7 +53,7 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
       t.total_km?.toString() || "0",
       t.total_miles?.toString() || "0",
       t.stops?.length?.toString() || "0",
-      (t as unknown as Record<string, string>)["status"] || "pending",
+      (t as Record<string, unknown>).status as string || "pending",
     ])
     const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n")
     const blob = new Blob([csv], { type: "text/csv" })
@@ -79,19 +77,20 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
         </button>
       </div>
 
+      {/* Filters */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <label className="block text-xs text-gray-500 mb-1">Driver</label>
           <select className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" value={filterDriver} onChange={(e) => setFilterDriver(e.target.value)}>
             <option value="">All Drivers</option>
-            {driverNames.map((d) => <option key={d} value={d}>{d}</option>)}
+            {drivers.map((d) => <option key={d} value={d ?? ""}>{d}</option>)}
           </select>
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">Truck</label>
           <select className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100" value={filterTruck} onChange={(e) => setFilterTruck(e.target.value)}>
             <option value="">All Trucks</option>
-            {truckNumbers.map((t) => <option key={t} value={t}>{t}</option>)}
+            {trucks.map((t) => <option key={t} value={t ?? ""}>{t}</option>)}
           </select>
         </div>
         <div>
@@ -104,6 +103,7 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
         </div>
       </div>
 
+      {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Total Trips", value: filtered.length },
@@ -117,6 +117,7 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
         ))}
       </div>
 
+      {/* Per Driver Summary */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h2 className="font-semibold text-white mb-4">Summary by Driver</h2>
         <table className="w-full text-sm">

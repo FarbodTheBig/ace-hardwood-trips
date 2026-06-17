@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { generateTripPDF } from "@/lib/pdfGenerator"
 import { TripSheet, TripStop } from "@/types"
 import { v4 as uuidv4 } from "uuid"
+import PhotoUpload from "./PhotoUpload"
 
 const STOP_TYPES = [
   "Pickup Trailer/Truck",
@@ -30,17 +31,8 @@ function blankStop(): TripStop {
   }
 }
 
-// Address autocomplete using OpenStreetMap Nominatim
-function AddressInput({
-  value,
-  onChange,
-  disabled,
-  placeholder,
-}: {
-  value: string
-  onChange: (val: string) => void
-  disabled?: boolean
-  placeholder?: string
+function AddressInput({ value, onChange, disabled, placeholder }: {
+  value: string; onChange: (val: string) => void; disabled?: boolean; placeholder?: string
 }) {
   const [suggestions, setSuggestions] = useState<{ display_name: string }[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -75,9 +67,7 @@ function AddressInput({
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setShowSuggestions(false)
-      }
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setShowSuggestions(false)
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
@@ -85,23 +75,14 @@ function AddressInput({
 
   return (
     <div ref={wrapperRef} className="relative">
-      <input
-        className="input-field"
-        placeholder={placeholder || "Start typing address..."}
-        value={value}
-        onChange={handleChange}
-        disabled={disabled}
-        autoComplete="off"
-      />
+      <input className="input-field" placeholder={placeholder || "Start typing address..."} value={value}
+        onChange={handleChange} disabled={disabled} autoComplete="off" />
       {showSuggestions && suggestions.length > 0 && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
           {suggestions.map((s, i) => (
-            <button
-              key={i}
-              type="button"
+            <button key={i} type="button"
               className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-700 transition-colors border-b border-gray-700/50 last:border-0"
-              onMouseDown={() => handleSelect(s.display_name)}
-            >
+              onMouseDown={() => handleSelect(s.display_name)}>
               {s.display_name}
             </button>
           ))}
@@ -111,19 +92,11 @@ function AddressInput({
   )
 }
 
-// Simple date picker popup
-function DatePickerInput({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: string
-  onChange: (val: string) => void
-  disabled?: boolean
+function DatePickerInput({ value, onChange, disabled }: {
+  value: string; onChange: (val: string) => void; disabled?: boolean
 }) {
   const [show, setShow] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-
   const today = new Date()
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
@@ -142,8 +115,7 @@ function DatePickerInput({
 
   function selectDay(day: number) {
     const d = new Date(viewYear, viewMonth, day)
-    const formatted = d.toLocaleDateString("en-CA", { day: "numeric", month: "short" })
-    onChange(formatted)
+    onChange(d.toLocaleDateString("en-CA", { day: "numeric", month: "short" }))
     setShow(false)
   }
 
@@ -153,54 +125,31 @@ function DatePickerInput({
 
   return (
     <div ref={ref} className="relative">
-      <input
-        className="input-field cursor-pointer"
-        placeholder="e.g. 12 Jun"
-        value={value}
-        onClick={() => !disabled && setShow(true)}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        readOnly={!disabled}
-      />
+      <input className="input-field cursor-pointer" placeholder="e.g. 12 Jun" value={value}
+        onClick={() => !disabled && setShow(true)} onChange={(e) => onChange(e.target.value)}
+        disabled={disabled} readOnly={!disabled} />
       {show && (
         <div className="absolute z-50 mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-3 w-64">
-          {/* Header */}
           <div className="flex items-center justify-between mb-3">
-            <button
-              type="button"
-              onClick={() => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) } else setViewMonth(m => m - 1) }}
-              className="text-gray-400 hover:text-white p-1 rounded"
-            >‹</button>
+            <button type="button" onClick={() => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) } else setViewMonth(m => m - 1) }}
+              className="text-gray-400 hover:text-white p-1 rounded">‹</button>
             <span className="text-white text-sm font-semibold">{monthNames[viewMonth]} {viewYear}</span>
-            <button
-              type="button"
-              onClick={() => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1) } else setViewMonth(m => m + 1) }}
-              className="text-gray-400 hover:text-white p-1 rounded"
-            >›</button>
+            <button type="button" onClick={() => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1) } else setViewMonth(m => m + 1) }}
+              className="text-gray-400 hover:text-white p-1 rounded">›</button>
           </div>
-          {/* Day headers */}
           <div className="grid grid-cols-7 mb-1">
             {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
               <div key={d} className="text-center text-xs text-gray-500 py-1">{d}</div>
             ))}
           </div>
-          {/* Days */}
           <div className="grid grid-cols-7 gap-0.5">
             {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1
               const isSelected = selectedDay === day && selectedMonth === monthNames[viewMonth]
               return (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => selectDay(day)}
-                  className={`text-center text-xs py-1.5 rounded-lg transition-colors ${
-                    isSelected
-                      ? "bg-brand-500 text-white"
-                      : "text-gray-300 hover:bg-gray-700"
-                  }`}
-                >
+                <button key={day} type="button" onClick={() => selectDay(day)}
+                  className={`text-center text-xs py-1.5 rounded-lg transition-colors ${isSelected ? "bg-brand-500 text-white" : "text-gray-300 hover:bg-gray-700"}`}>
                   {day}
                 </button>
               )
@@ -213,16 +162,18 @@ function DatePickerInput({
 }
 
 interface Props {
-  initialData?: TripSheet
+  initialData?: TripSheet & { id?: string }
   driverName: string
+  userId: string
   readOnly?: boolean
 }
 
-export default function TripForm({ initialData, driverName, readOnly = false }: Props) {
+export default function TripForm({ initialData, driverName, userId, readOnly = false }: Props) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState("")
+  const tripId = useRef<string>(initialData?.id || uuidv4())
 
   const [form, setForm] = useState<TripSheet>(() => ({
     driver_name: driverName,
@@ -241,7 +192,6 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
     ...initialData,
   }))
 
-  // Auto-calc KM
   useEffect(() => {
     const start = parseFloat(form.start_km) || 0
     const end = parseFloat(form.end_km) || 0
@@ -249,7 +199,6 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
     setForm((f) => ({ ...f, total_km: totalKm, total_miles: parseFloat((totalKm * 0.621371).toFixed(2)) }))
   }, [form.start_km, form.end_km])
 
-  // Auto-sync trip number from first stop
   useEffect(() => {
     const firstStopTripNum = form.stops[0]?.trip_number
     if (firstStopTripNum && !readOnly) {
@@ -262,10 +211,7 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
   }
 
   function updateStop(id: string, field: keyof TripStop, value: string) {
-    setForm((f) => ({
-      ...f,
-      stops: f.stops.map((s) => (s.id === id ? { ...s, [field]: value } : s)),
-    }))
+    setForm((f) => ({ ...f, stops: f.stops.map((s) => (s.id === id ? { ...s, [field]: value } : s)) }))
   }
 
   function addStop() {
@@ -280,13 +226,9 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
     setSaving(true)
     setError("")
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setError("Not logged in"); setSaving(false); return }
 
-    const payload = { ...form, user_id: user.id }
-    const { error: dbError } = initialData?.id
-      ? await supabase.from("trip_sheets").update(payload).eq("id", initialData.id)
-      : await supabase.from("trip_sheets").insert(payload)
+    const payload = { ...form, id: tripId.current, user_id: userId }
+    const { error: dbError } = await supabase.from("trip_sheets").upsert(payload)
 
     if (dbError) { setError(dbError.message) } else {
       setSaved(true)
@@ -301,7 +243,6 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
 
   return (
     <div className="space-y-6">
-      {/* Trip Information */}
       <div className="card">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-1 h-6 bg-brand-500 rounded-full" />
@@ -320,39 +261,34 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
               Trip Number(s) <span className="text-brand-500">(auto-filled from stops)</span>
             </label>
-            <input
-              className="w-full bg-brand-500/10 border border-brand-500/30 rounded-lg px-3 py-2 text-sm text-brand-400 font-semibold"
-              value={form.trip_numbers}
-              onChange={(e) => updateField("trip_numbers", e.target.value)}
-              placeholder="Auto-filled from first stop"
-              readOnly={readOnly}
-            />
+            <input className="w-full bg-brand-500/10 border border-brand-500/30 rounded-lg px-3 py-2 text-sm text-brand-400 font-semibold"
+              value={form.trip_numbers} onChange={(e) => updateField("trip_numbers", e.target.value)}
+              placeholder="Auto-filled from first stop" readOnly={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Truck #</label>
-            <input
-              className={inputClass}
-              placeholder="e.g. 0013 - Volvo"
-              value={form.truck_number}
-              onChange={(e) => updateField("truck_number", e.target.value)}
-              disabled={readOnly}
-            />
+            <input className={inputClass} placeholder="e.g. 0013 - Volvo" value={form.truck_number}
+              onChange={(e) => updateField("truck_number", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Start Date / Time</label>
-            <input type="datetime-local" className={inputClass} value={form.start_date_time} onChange={(e) => updateField("start_date_time", e.target.value)} disabled={readOnly} />
+            <input type="datetime-local" className={inputClass} value={form.start_date_time}
+              onChange={(e) => updateField("start_date_time", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">End Date / Time</label>
-            <input type="datetime-local" className={inputClass} value={form.end_date_time} onChange={(e) => updateField("end_date_time", e.target.value)} disabled={readOnly} />
+            <input type="datetime-local" className={inputClass} value={form.end_date_time}
+              onChange={(e) => updateField("end_date_time", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Start KM</label>
-            <input type="number" className={inputClass} placeholder="e.g. 1417535" value={form.start_km} onChange={(e) => updateField("start_km", e.target.value)} disabled={readOnly} />
+            <input type="number" className={inputClass} placeholder="e.g. 1417535" value={form.start_km}
+              onChange={(e) => updateField("start_km", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">End KM</label>
-            <input type="number" className={inputClass} placeholder="e.g. 1421406" value={form.end_km} onChange={(e) => updateField("end_km", e.target.value)} disabled={readOnly} />
+            <input type="number" className={inputClass} placeholder="e.g. 1421406" value={form.end_km}
+              onChange={(e) => updateField("end_km", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Total KM <span className="text-brand-500">(auto)</span></label>
@@ -365,7 +301,6 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
         </div>
       </div>
 
-      {/* Stops */}
       <div className="card">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -381,7 +316,7 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {form.stops.map((stop, i) => (
             <div key={stop.id} className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
@@ -403,38 +338,52 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Time</label>
-                  <input type="time" className={readOnly ? inputClass : "input-field"} value={stop.time} onChange={(e) => updateStop(stop.id, "time", e.target.value)} disabled={readOnly} />
+                  <input type="time" className={readOnly ? inputClass : "input-field"} value={stop.time}
+                    onChange={(e) => updateStop(stop.id, "time", e.target.value)} disabled={readOnly} />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <label className="block text-xs text-gray-500 mb-1">Type</label>
-                  <select className={readOnly ? inputClass : "input-field"} value={stop.type} onChange={(e) => updateStop(stop.id, "type", e.target.value)} disabled={readOnly}>
+                  <select className={readOnly ? inputClass : "input-field"} value={stop.type}
+                    onChange={(e) => updateStop(stop.id, "type", e.target.value)} disabled={readOnly}>
                     <option value="">Select type…</option>
                     {STOP_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
-                <div className="col-span-2 sm:col-span-2 lg:col-span-2">
+                <div className="col-span-2">
                   <label className="block text-xs text-gray-500 mb-1">Address / Location</label>
                   {readOnly ? (
                     <input className={inputClass} value={stop.address} disabled readOnly />
                   ) : (
-                    <AddressInput value={stop.address} onChange={(v) => updateStop(stop.id, "address", v)} placeholder="Start typing address..." />
+                    <AddressInput value={stop.address} onChange={(v) => updateStop(stop.id, "address", v)} />
                   )}
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Trip #</label>
-                  <input className={readOnly ? inputClass : "input-field"} placeholder="e.g. 1225" value={stop.trip_number} onChange={(e) => updateStop(stop.id, "trip_number", e.target.value)} disabled={readOnly} />
+                  <input className={readOnly ? inputClass : "input-field"} placeholder="e.g. 1225" value={stop.trip_number}
+                    onChange={(e) => updateStop(stop.id, "trip_number", e.target.value)} disabled={readOnly} />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Trailer #</label>
-                  <input className={readOnly ? inputClass : "input-field"} placeholder="e.g. PV1021" value={stop.trailer_number} onChange={(e) => updateStop(stop.id, "trailer_number", e.target.value)} disabled={readOnly} />
+                  <input className={readOnly ? inputClass : "input-field"} placeholder="e.g. PV1021" value={stop.trailer_number}
+                    onChange={(e) => updateStop(stop.id, "trailer_number", e.target.value)} disabled={readOnly} />
                 </div>
+              </div>
+
+              {/* Photo Upload */}
+              <div className="mt-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">📎 Photos</p>
+                <PhotoUpload
+                  tripId={tripId.current}
+                  stopIndex={i}
+                  userId={userId}
+                  readOnly={readOnly}
+                />
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Signature */}
       <div className="card">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-1 h-6 bg-brand-500 rounded-full" />
@@ -443,16 +392,17 @@ export default function TripForm({ initialData, driverName, readOnly = false }: 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Signature (type your name)</label>
-            <input className={inputClass} placeholder="Type full name as signature" value={form.driver_signature} onChange={(e) => updateField("driver_signature", e.target.value)} disabled={readOnly} />
+            <input className={inputClass} placeholder="Type full name as signature" value={form.driver_signature}
+              onChange={(e) => updateField("driver_signature", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Date</label>
-            <input type="date" className={inputClass} value={form.signature_date} onChange={(e) => updateField("signature_date", e.target.value)} disabled={readOnly} />
+            <input type="date" className={inputClass} value={form.signature_date}
+              onChange={(e) => updateField("signature_date", e.target.value)} disabled={readOnly} />
           </div>
         </div>
       </div>
 
-      {/* Actions */}
       <div className="flex flex-wrap items-center gap-3 no-print">
         {!readOnly && (
           <button onClick={handleSave} disabled={saving || saved} className="btn-primary flex items-center gap-2">

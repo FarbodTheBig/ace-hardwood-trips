@@ -4,6 +4,7 @@ import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { generateTripPDF } from "@/lib/pdfGenerator"
 import { TripSheet } from "@/types"
+import AdminPhotoViewer from "./AdminPhotoViewer"
 
 interface Trip extends TripSheet {
   id: string
@@ -14,6 +15,7 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
   const [trips, setTrips] = useState(initialTrips)
   const [search, setSearch] = useState("")
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [expandedPhotos, setExpandedPhotos] = useState<string | null>(null)
 
   const filtered = trips.filter((t) => {
     const q = search.toLowerCase()
@@ -33,10 +35,6 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
     setDeleting(null)
   }
 
-  function handlePDF(trip: Trip) {
-    generateTripPDF(trip)
-  }
-
   return (
     <div className="space-y-6">
       <div>
@@ -45,12 +43,9 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
       </div>
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-        <input
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+        <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
           placeholder="Search by driver, trip #, truck #..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+          value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {filtered.length === 0 ? (
@@ -59,66 +54,46 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
           <p className="text-gray-400">No trips found</p>
         </div>
       ) : (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Driver</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Trip #</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Truck</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Date</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">KM</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">Stops</th>
-                  <th className="text-right py-3 px-4 text-gray-400 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((trip) => (
-                  <tr key={trip.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-red-600/20 rounded-full flex items-center justify-center text-red-400 font-semibold text-xs shrink-0">
-                          {(trip.driver_name || "?").charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-white font-medium truncate max-w-[120px]">{trip.driver_name || "—"}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-gray-300">{trip.trip_numbers || "—"}</td>
-                    <td className="py-3 px-4 text-gray-300">{trip.truck_number || "—"}</td>
-                    <td className="py-3 px-4 text-gray-400">
-                      {new Date(trip.created_at).toLocaleDateString("en-CA")}
-                    </td>
-                    <td className="py-3 px-4 text-red-400 font-semibold text-right">
-                      {trip.total_km?.toLocaleString() || 0}
-                    </td>
-                    <td className="py-3 px-4 text-gray-400 text-right">
-                      {trip.stops?.length || 0}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handlePDF(trip)}
-                          className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1.5 rounded-lg transition-colors"
-                          title="Export PDF"
-                        >
-                          PDF
-                        </button>
-                        <button
-                          onClick={() => handleDelete(trip.id)}
-                          disabled={deleting === trip.id}
-                          className="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 px-2 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                          title="Delete trip"
-                        >
-                          {deleting === trip.id ? "..." : "Delete"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="space-y-3">
+          {filtered.map((trip) => (
+            <div key={trip.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-red-600/20 rounded-full flex items-center justify-center text-red-400 font-semibold text-xs shrink-0">
+                    {(trip.driver_name || "?").charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">{trip.driver_name || "—"}</div>
+                    <div className="text-xs text-gray-500">
+                      Trip {trip.trip_numbers || "—"} · {trip.truck_number || "—"} · {new Date(trip.created_at).toLocaleDateString("en-CA")}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-red-400 font-semibold text-sm">{trip.total_km?.toLocaleString() || 0} km</span>
+                  <button
+                    onClick={() => setExpandedPhotos(expandedPhotos === trip.id ? null : trip.id)}
+                    className={`text-xs px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${expandedPhotos === trip.id ? "bg-brand-500/20 text-brand-400" : "bg-gray-800 hover:bg-gray-700 text-gray-300"}`}>
+                    📷 Photos
+                  </button>
+                  <button onClick={() => generateTripPDF(trip)}
+                    className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1.5 rounded-lg transition-colors">
+                    PDF
+                  </button>
+                  <button onClick={() => handleDelete(trip.id)} disabled={deleting === trip.id}
+                    className="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 px-2 py-1.5 rounded-lg transition-colors disabled:opacity-50">
+                    {deleting === trip.id ? "..." : "Delete"}
+                  </button>
+                </div>
+              </div>
+
+              {expandedPhotos === trip.id && (
+                <div className="border-t border-gray-800 p-4">
+                  <AdminPhotoViewer tripId={trip.id} driverName={trip.driver_name || "driver"} />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
