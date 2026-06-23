@@ -14,7 +14,7 @@ export default function DashboardCharts({ weeklyKm, topRoutes }: Props) {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Weekly KM */}
       <div className="card">
-        <h2 className="font-semibold text-white mb-6">KM per Week</h2>
+        <h2 className="font-semibold text-white mb-6">KM per Day</h2>
         {weeklyKm.length === 0 ? (
           <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
             No data yet
