@@ -51,7 +51,9 @@ export default function AdminPhotoViewer({ tripId, driverName }: Props) {
     fetchPhotos()
   }, [tripId])
 
-  const stops = [...new Set(photos.map((p) => p.stop_index))].sort((a, b) => a - b)
+  const stopSet: number[] = []
+  photos.forEach((p) => { if (!stopSet.includes(p.stop_index)) stopSet.push(p.stop_index) })
+  const stops = stopSet.sort((a, b) => a - b)
 
   const filtered = photos.filter((p) => {
     return (activeStop === "all" || p.stop_index === activeStop) &&
@@ -82,27 +84,25 @@ export default function AdminPhotoViewer({ tripId, driverName }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">{photos.length} photo{photos.length !== 1 ? "s" : ""} total</p>
-        <button onClick={downloadAll} className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1">
+        <button onClick={downloadAll} className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1">
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
           Download All ({filtered.length})
         </button>
       </div>
 
-      {/* Stop Filter */}
       <div className="flex gap-1 flex-wrap">
         <button onClick={() => setActiveStop("all")}
-          className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${activeStop === "all" ? "bg-red-600 text-white" : "bg-gray-800 text-gray-400 hover:text-white"}`}>
+          className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${activeStop === "all" ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:text-white"}`}>
           All Stops
         </button>
         {stops.map((s) => (
           <button key={s} onClick={() => setActiveStop(s)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${activeStop === s ? "bg-red-600 text-white" : "bg-gray-800 text-gray-400 hover:text-white"}`}>
+            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${activeStop === s ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:text-white"}`}>
             Stop {s + 1}
           </button>
         ))}
       </div>
 
-      {/* Category Filter */}
       <div className="flex gap-1">
         <button onClick={() => setActiveCategory("all")}
           className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${activeCategory === "all" ? "bg-gray-700 text-white" : "bg-gray-800 text-gray-400 hover:text-white"}`}>
@@ -116,7 +116,6 @@ export default function AdminPhotoViewer({ tripId, driverName }: Props) {
         ))}
       </div>
 
-      {/* Photo Grid */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
         {filtered.map((photo) => (
           <div key={photo.id} className="relative group">
