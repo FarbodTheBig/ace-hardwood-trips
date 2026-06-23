@@ -12,11 +12,10 @@ export default async function DashboardPage() {
     .from("trip_sheets")
     .select("*")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: true })
 
   const allTrips = trips || []
 
-  // Stats
   const totalTrips = allTrips.length
   const totalKm = allTrips.reduce((sum, t) => sum + (t.total_km || 0), 0)
 
@@ -28,15 +27,20 @@ export default async function DashboardPage() {
   const tripsThisMonth = thisMonth.length
   const kmThisMonth = thisMonth.reduce((sum, t) => sum + (t.total_km || 0), 0)
 
-  // Weekly KM (last 8 weeks)
+  // Weekly KM — group by actual week start (Monday), show last 8 weeks
   const weeklyMap: Record<string, number> = {}
   allTrips.forEach((t) => {
     const d = new Date(t.created_at)
-    const weekStart = new Date(d)
-    weekStart.setDate(d.getDate() - d.getDay())
-    const key = weekStart.toLocaleDateString("en-CA", { month: "short", day: "numeric" })
+    // Get Monday of this week
+    const day = d.getDay()
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+    const monday = new Date(d)
+    monday.setDate(diff)
+    monday.setHours(0, 0, 0, 0)
+    const key = monday.toLocaleDateString("en-CA", { month: "short", day: "numeric" })
     weeklyMap[key] = (weeklyMap[key] || 0) + (t.total_km || 0)
   })
+
   const weeklyKm = Object.entries(weeklyMap)
     .slice(-8)
     .map(([week, km]) => ({ week, km }))
@@ -60,7 +64,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -76,7 +79,6 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total Trips", value: totalTrips.toString(), icon: "🚛" },
@@ -92,24 +94,18 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Charts */}
       <DashboardCharts weeklyKm={weeklyKm} topRoutes={topRoutes} />
 
-      {/* Recent Trips */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-white">Recent Trips</h2>
-          <Link href="/history" className="text-sm text-brand-500 hover:text-brand-400">
-            View all →
-          </Link>
+          <Link href="/history" className="text-sm text-brand-500 hover:text-brand-400">View all →</Link>
         </div>
         {allTrips.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <div className="text-4xl mb-3">🚛</div>
             <p>No trips yet. Start by creating your first trip sheet.</p>
-            <Link href="/trip/new" className="btn-primary inline-block mt-4">
-              Create Trip Sheet
-            </Link>
+            <Link href="/trip/new" className="btn-primary inline-block mt-4">Create Trip Sheet</Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -124,19 +120,13 @@ export default async function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {allTrips.slice(0, 5).map((trip) => (
+                {[...allTrips].reverse().slice(0, 5).map((trip) => (
                   <tr key={trip.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
                     <td className="py-3 px-3 text-white font-medium">{trip.trip_numbers || "—"}</td>
                     <td className="py-3 px-3 text-gray-300">{trip.truck_number || "—"}</td>
-                    <td className="py-3 px-3 text-gray-300">
-                      {new Date(trip.created_at).toLocaleDateString("en-CA")}
-                    </td>
-                    <td className="py-3 px-3 text-gray-300 text-right">
-                      {trip.total_km?.toLocaleString() || "0"}
-                    </td>
-                    <td className="py-3 px-3 text-gray-300 text-right">
-                      {trip.stops?.length || 0}
-                    </td>
+                    <td className="py-3 px-3 text-gray-300">{new Date(trip.created_at).toLocaleDateString("en-CA")}</td>
+                    <td className="py-3 px-3 text-gray-300 text-right">{trip.total_km?.toLocaleString() || "0"}</td>
+                    <td className="py-3 px-3 text-gray-300 text-right">{trip.stops?.length || 0}</td>
                   </tr>
                 ))}
               </tbody>

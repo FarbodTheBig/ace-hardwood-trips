@@ -5,12 +5,12 @@ import { TripSheet } from "@/types"
 export function generateTripPDF(trip: TripSheet) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" })
 
-  const orange = [59, 130, 246] as [number, number, number]
+  const blue = [59, 130, 246] as [number, number, number]
   const darkGray = [30, 30, 30] as [number, number, number]
   const lightGray = [245, 245, 245] as [number, number, number]
 
   // Header bar
-  doc.setFillColor(...orange)
+  doc.setFillColor(...blue)
   doc.rect(0, 0, 216, 28, "F")
 
   doc.setTextColor(255, 255, 255)
@@ -22,11 +22,17 @@ export function generateTripPDF(trip: TripSheet) {
   doc.setFont("helvetica", "normal")
   doc.text("DRIVER TRIP SHEET", 14, 21)
 
+  // Company name on right side of header
+  if (trip.company_name) {
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "bold")
+    doc.text(trip.company_name, 200, 16, { align: "right" })
+  }
+
   // Info grid
   const infoY = 36
   doc.setTextColor(...darkGray)
   doc.setFontSize(9)
-  doc.setFont("helvetica", "bold")
 
   const infoLeft = [
     ["Driver Name", trip.driver_name],
@@ -88,7 +94,7 @@ export function generateTripPDF(trip: TripSheet) {
       lineWidth: 0.2,
     },
     headStyles: {
-      fillColor: orange,
+      fillColor: blue,
       textColor: [255, 255, 255],
       fontStyle: "bold",
       fontSize: 8.5,
@@ -115,9 +121,23 @@ export function generateTripPDF(trip: TripSheet) {
   doc.setFontSize(9)
   doc.setTextColor(100, 100, 100)
   doc.text("Driver Signature:", 14, finalY)
-  doc.setDrawColor(...orange)
+
+  // Draw signature line
+  doc.setDrawColor(...blue)
   doc.line(50, finalY, 130, finalY)
 
+  // Print the actual signature text on the line
+  if (trip.driver_signature) {
+    doc.setFont("helvetica", "italic")
+    doc.setFontSize(10)
+    doc.setTextColor(...darkGray)
+    doc.text(trip.driver_signature, 52, finalY - 1)
+  }
+
+  // Date
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(9)
+  doc.setTextColor(100, 100, 100)
   doc.text("Date:", 140, finalY)
   doc.setTextColor(...darkGray)
   doc.setFont("helvetica", "normal")
