@@ -27,15 +27,22 @@ export default async function DashboardPage() {
   const tripsThisMonth = thisMonth.length
   const kmThisMonth = thisMonth.reduce((sum, t) => sum + (t.total_km || 0), 0)
 
-  // Daily KM — one bar per day that had a trip, last 30 days
-  const dailyMap: Record<string, number> = {}
+  // Weekly KM — group by actual week start (Monday), show last 8 weeks
+  const weeklyMap: Record<string, number> = {}
   allTrips.forEach((t) => {
     const d = new Date(t.created_at)
-    const key = d.toLocaleDateString("en-CA", { month: "short", day: "numeric" })
-    dailyMap[key] = (dailyMap[key] || 0) + (t.total_km || 0)
+    // Get Monday of this week
+    const day = d.getDay()
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+    const monday = new Date(d)
+    monday.setDate(diff)
+    monday.setHours(0, 0, 0, 0)
+    const key = monday.toLocaleDateString("en-CA", { month: "short", day: "numeric" })
+    weeklyMap[key] = (weeklyMap[key] || 0) + (t.total_km || 0)
   })
-  const weeklyKm = Object.entries(dailyMap)
-    .slice(-14)
+
+  const weeklyKm = Object.entries(weeklyMap)
+    .slice(-8)
     .map(([week, km]) => ({ week, km }))
 
   // Top routes
