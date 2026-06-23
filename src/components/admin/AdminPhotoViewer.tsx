@@ -51,7 +51,7 @@ export default function AdminPhotoViewer({ tripId, driverName }: Props) {
     fetchPhotos()
   }, [tripId])
 
-  const stopSet: number[] = []; photos.forEach((p) => { if (!stopSet.includes(p.stop_index)) stopSet.push(p.stop_index) }); const stops = stopSet.sort((a, b) => a - b)
+  const stops = [...new Set(photos.map((p) => p.stop_index))].sort((a, b) => a - b)
 
   const filtered = photos.filter((p) => {
     return (activeStop === "all" || p.stop_index === activeStop) &&

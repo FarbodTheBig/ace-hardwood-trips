@@ -177,7 +177,7 @@ export default function TripForm({ initialData, driverName, userId, readOnly = f
 
   const [form, setForm] = useState<TripSheet>(() => ({
     driver_name: driverName,
-    company_name: "ACE HARDWOOD INC.",
+    company_name: "",
     trip_numbers: "",
     truck_number: "",
     start_date_time: "",
@@ -251,11 +251,11 @@ export default function TripForm({ initialData, driverName, userId, readOnly = f
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Company Name</label>
-            <input className={inputClass} value={form.company_name} disabled readOnly />
+            <input className={inputClass} placeholder="e.g. Ace Hardwood Inc." value={form.company_name} onChange={(e) => updateField("company_name", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Driver Name</label>
-            <input className={inputClass} value={form.driver_name} disabled readOnly />
+            <input className={inputClass} placeholder="Your full name" value={form.driver_name} onChange={(e) => updateField("driver_name", e.target.value)} disabled={readOnly} />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">

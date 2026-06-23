@@ -5,7 +5,7 @@ import { TripSheet } from "@/types"
 export function generateTripPDF(trip: TripSheet) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" })
 
-  const orange = [249, 115, 22] as [number, number, number]
+  const orange = [59, 130, 246] as [number, number, number]
   const darkGray = [30, 30, 30] as [number, number, number]
   const lightGray = [245, 245, 245] as [number, number, number]
 
@@ -16,7 +16,7 @@ export function generateTripPDF(trip: TripSheet) {
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(18)
   doc.setFont("helvetica", "bold")
-  doc.text("ACE HARDWOOD INC.", 14, 12)
+  doc.text("RoadLog", 14, 12)
 
   doc.setFontSize(11)
   doc.setFont("helvetica", "normal")
@@ -127,7 +127,7 @@ export function generateTripPDF(trip: TripSheet) {
   doc.setFontSize(7.5)
   doc.setTextColor(160, 160, 160)
   doc.text(
-    `Generated: ${new Date().toLocaleString("en-CA")} — ACE HARDWOOD INC. Driver Portal`,
+    `Generated: ${new Date().toLocaleString("en-CA")} — RoadLog`,
     14,
     285
   )

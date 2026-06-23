@@ -14,8 +14,8 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
   const [filterTo, setFilterTo] = useState("")
   const [filterTruck, setFilterTruck] = useState("")
 
-  const drivers: string[] = []; trips.forEach((t) => { if (t.driver_name && !drivers.includes(t.driver_name)) drivers.push(t.driver_name) })
-  const trucks: string[] = []; trips.forEach((t) => { if (t.truck_number && !trucks.includes(t.truck_number)) trucks.push(t.truck_number) })
+  const drivers = [...new Set(trips.map((t) => t.driver_name).filter(Boolean))]
+  const trucks = [...new Set(trips.map((t) => t.truck_number).filter(Boolean))]
 
   const filtered = trips.filter((t) => {
     const date = new Date(t.created_at)
@@ -53,7 +53,7 @@ export default function ReportsClient({ trips }: { trips: Trip[] }) {
       t.total_km?.toString() || "0",
       t.total_miles?.toString() || "0",
       t.stops?.length?.toString() || "0",
-      (t as unknown as Record<string, string>)["status"] || "pending",
+      (t as Record<string, unknown>).status as string || "pending",
     ])
     const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n")
     const blob = new Blob([csv], { type: "text/csv" })

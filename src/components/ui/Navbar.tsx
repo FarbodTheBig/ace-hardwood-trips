@@ -28,26 +28,24 @@ export default function Navbar({ userName }: { userName: string }) {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2.5 0M13 16H3m10 0h1m1-9h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16h-2" />
                 </svg>
               </div>
-              <span className="font-bold text-white text-sm hidden sm:block">ACE HARDWOOD</span>
+              <span className="font-bold text-white text-sm hidden sm:block">RoadLog</span>
             </Link>
             <div className="flex items-center gap-1">
               {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={clsx(
-                    "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                <Link key={link.href} href={link.href}
+                  className={clsx("px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
-                      ? "bg-brand-500/10 text-brand-400"
+                      ? "bg-blue-500/10 text-blue-400"
                       : "text-gray-400 hover:text-white hover:bg-gray-800"
-                  )}
-                >
+                  )}>
                   {link.label}
                 </Link>
               ))}
@@ -55,9 +53,7 @@ export default function Navbar({ userName }: { userName: string }) {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-400 hidden sm:block">{userName}</span>
-            <button onClick={handleLogout} className="btn-ghost text-sm py-1.5">
-              Sign out
-            </button>
+            <button onClick={handleLogout} className="btn-ghost text-sm py-1.5">Sign out</button>
           </div>
         </div>
       </div>
