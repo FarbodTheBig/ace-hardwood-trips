@@ -26,24 +26,22 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
   const initials = adminName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
 
   return (
-    <aside className="w-[196px] bg-[#111] border-r border-[#1e1e1e] flex flex-col h-screen sticky top-0 flex-shrink-0">
-      {/* Logo + Admin Badge */}
-      <div className="px-4 py-4 border-b border-[#1e1e1e]">
-        <div className="flex items-center gap-2.5 mb-3">
-          <div className="w-[26px] h-[26px] rounded-[6px] bg-[#3b82f6] flex items-center justify-center flex-shrink-0">
-            <svg className="w-[13px] h-[13px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <aside className="w-[200px] bg-[#111] border-r border-[#222] flex flex-col h-screen sticky top-0 flex-shrink-0">
+      <div className="px-4 py-4 border-b border-[#222]">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-7 h-7 rounded-lg bg-[#3b82f6] flex items-center justify-center flex-shrink-0">
+            <svg className="w-[14px] h-[14px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
             </svg>
           </div>
-          <span className="text-[13px] font-semibold text-[#e8e8e8] tracking-tight">RoadLog</span>
+          <span className="text-[14px] font-bold text-white">RoadLog</span>
         </div>
-        <div className="inline-flex items-center gap-1.5 border border-[#222] rounded-[4px] px-1.5 py-0.5">
-          <div className="w-1 h-1 rounded-full bg-[#3b82f6]"></div>
-          <span className="text-[9px] font-semibold text-[#3a3a3a] uppercase tracking-widest">Admin</span>
+        <div className="inline-flex items-center gap-1.5 border border-[#333] rounded px-2 py-0.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]"></div>
+          <span className="text-[10px] font-semibold text-[#666] uppercase tracking-widest">Admin</span>
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-2 py-3 flex flex-col gap-0.5">
         {navLinks.map((link) => {
           const isActive = pathname.startsWith(link.href)
@@ -56,15 +54,14 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
         })}
       </nav>
 
-      {/* User */}
-      <div className="px-2 py-3 border-t border-[#1e1e1e]">
+      <div className="px-2 py-3 border-t border-[#222]">
         <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-[#181818]">
-          <div className="w-[22px] h-[22px] rounded-[5px] bg-[#1a2332] border border-[#2a3a4a] flex items-center justify-center text-[8px] font-bold text-[#3b82f6] flex-shrink-0">
+          <div className="w-6 h-6 rounded-md bg-[#1a2332] border border-[#2a3a4a] flex items-center justify-center text-[9px] font-bold text-[#60a5fa] flex-shrink-0">
             {initials}
           </div>
-          <span className="text-[11px] text-[#333] truncate flex-1">{adminName}</span>
-          <button onClick={handleLogout} className="text-[#252525] hover:text-[#555] transition-colors" title="Sign out">
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <span className="text-[12px] text-[#666] truncate flex-1">{adminName}</span>
+          <button onClick={handleLogout} className="text-[#333] hover:text-[#666] transition-colors" title="Sign out">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
             </svg>
           </button>
