@@ -26,9 +26,9 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center p-6">
-      <div className="w-full max-w-[820px] flex rounded-2xl overflow-hidden border border-[#151d35]" style={{minHeight:"500px"}}>
-        <div className="flex-1 bg-[#070b16] border-r border-[#151d35] flex flex-col justify-center px-10 py-10">
+    <div className="min-h-screen bg-[#eef2f7] flex items-center justify-center p-6">
+      <div className="w-full max-w-[820px] flex rounded-2xl overflow-hidden border border-[#d8e0ec] shadow-sm" style={{minHeight:"500px"}}>
+        <div className="flex-1 bg-[#0f1a35] flex flex-col justify-center px-10 py-10">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 rounded-lg bg-[#2563eb] flex items-center justify-center flex-shrink-0">
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -37,41 +37,41 @@ export default function AdminLoginPage() {
             </div>
             <span className="text-[15px] font-bold text-white">RoadLog</span>
           </div>
-          <div className="inline-flex items-center gap-2 bg-[#0f1e4a] border border-[#1e2a50] rounded-full px-3 py-1 mb-6 w-fit">
+          <div className="inline-flex items-center gap-2 bg-[#162040] border border-[#1e3a6a] rounded-full px-3 py-1 mb-6 w-fit">
             <div className="w-1.5 h-1.5 rounded-full bg-[#60a5fa]"></div>
-            <span className="text-[10px] font-semibold text-[#60a5fa] uppercase tracking-widest">Admin Access</span>
+            <span className="text-[10px] font-bold text-[#60a5fa] uppercase tracking-widest">Admin Access</span>
           </div>
           <h2 className="text-[26px] font-bold text-white tracking-tight mb-2">Admin &amp; Dispatch<br/>Portal</h2>
-          <p className="text-[13px] text-[#2a3560] mb-8">Restricted to authorized personnel.</p>
+          <p className="text-[13px] text-[#475569] mb-8">Restricted to authorized personnel.</p>
           <div className="flex flex-col gap-3">
             {["Manage all driver accounts", "View trips & download photos", "Dispatch board & load assignment", "Export reports & CSV"].map((f) => (
               <div key={f} className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded border border-[#1e2a50] flex items-center justify-center flex-shrink-0 bg-[#0f1e4a]">
+                <div className="w-4 h-4 rounded border border-[#1e3a6a] flex items-center justify-center flex-shrink-0 bg-[#162040]">
                   <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <span className="text-[13px] text-[#4a5a90]">{f}</span>
+                <span className="text-[13px] text-[#475569]">{f}</span>
               </div>
             ))}
           </div>
         </div>
-        <div className="w-[300px] bg-[#0a0e1a] flex flex-col justify-center px-8">
-          <h3 className="text-[18px] font-bold text-white mb-1">Admin Sign In</h3>
-          <p className="text-[12px] text-[#2a3560] mb-7">Enter your admin credentials</p>
+        <div className="w-[300px] bg-white flex flex-col justify-center px-8">
+          <h3 className="text-[18px] font-bold text-[#0f1a35] mb-1">Admin Sign In</h3>
+          <p className="text-[12px] text-[#94a3b8] mb-7">Enter your admin credentials</p>
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
-              <label className="block text-[11px] font-semibold text-[#2a3560] uppercase tracking-widest mb-2">Email address</label>
+              <label className="block text-[11px] font-bold text-[#94a3b8] uppercase tracking-widest mb-2">Email address</label>
               <input type="email" className="input-field" placeholder="admin@roadlog.app" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div>
-              <label className="block text-[11px] font-semibold text-[#2a3560] uppercase tracking-widest mb-2">Password</label>
+              <label className="block text-[11px] font-bold text-[#94a3b8] uppercase tracking-widest mb-2">Password</label>
               <input type="password" className="input-field" placeholder="••••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
-            {error && <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-400">{error}</div>}
+            {error && <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">{error}</div>}
             <button type="submit" disabled={loading} className="btn-primary w-full text-sm mt-1">
               {loading ? "Signing in..." : "Sign In as Admin"}
             </button>
           </form>
-          <Link href="/auth/login" className="block text-center text-[11px] text-[#151d35] hover:text-[#2a3560] transition-colors mt-6">
+          <Link href="/auth/login" className="block text-center text-[11px] text-[#cbd5e1] hover:text-[#94a3b8] transition-colors mt-6">
             ← Driver portal
           </Link>
         </div>

@@ -24,15 +24,15 @@ export default function Sidebar({ userName }: { userName: string }) {
   const initials = userName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
 
   return (
-    <aside className="w-[200px] bg-[#070b16] border-r border-[#151d35] flex flex-col h-screen sticky top-0 no-print flex-shrink-0">
-      <div className="flex items-center gap-3 px-4 py-4 border-b border-[#151d35]">
+    <aside className="w-[200px] bg-white border-r border-[#d8e0ec] flex flex-col h-screen sticky top-0 no-print flex-shrink-0">
+      <div className="flex items-center gap-3 px-4 py-4 border-b border-[#d8e0ec]">
         <div className="w-7 h-7 rounded-lg bg-[#2563eb] flex items-center justify-center flex-shrink-0">
           <svg className="w-[14px] h-[14px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
             <path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 16H3m10 0h1m1-9h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16h-2"/>
           </svg>
         </div>
-        <span className="text-[14px] font-bold text-white">RoadLog</span>
+        <span className="text-[14px] font-bold text-[#0f1a35]">RoadLog</span>
       </div>
 
       <nav className="flex-1 px-2 py-3 flex flex-col gap-0.5">
@@ -47,13 +47,13 @@ export default function Sidebar({ userName }: { userName: string }) {
         })}
       </nav>
 
-      <div className="px-2 py-3 border-t border-[#151d35]">
-        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-[#0d1228]">
-          <div className="w-6 h-6 rounded-md bg-[#0f1e4a] border border-[#1a3080] flex items-center justify-center text-[9px] font-bold text-[#60a5fa] flex-shrink-0">
+      <div className="px-2 py-3 border-t border-[#d8e0ec]">
+        <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-[#f8fafc]">
+          <div className="w-6 h-6 rounded-md bg-[#dbeafe] flex items-center justify-center text-[9px] font-bold text-[#2563eb] flex-shrink-0">
             {initials}
           </div>
-          <span className="text-[12px] text-[#4a5a90] truncate flex-1">{userName}</span>
-          <button onClick={handleLogout} className="text-[#1e2a50] hover:text-[#4a5a90] transition-colors" title="Sign out">
+          <span className="text-[12px] text-[#64748b] truncate flex-1">{userName}</span>
+          <button onClick={handleLogout} className="text-[#cbd5e1] hover:text-[#64748b] transition-colors" title="Sign out">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
             </svg>
