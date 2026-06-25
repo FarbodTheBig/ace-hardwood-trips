@@ -33,12 +33,10 @@ export default async function DashboardPage() {
     if (t.stops && t.stops.length >= 2) {
       const first = t.stops[0]?.address?.split(",")[0] || "Unknown"
       const last = t.stops[t.stops.length - 1]?.address?.split(",")[0] || "Unknown"
-      const route = `${first} → ${last}`
-      routeMap[route] = (routeMap[route] || 0) + 1
+      routeMap[`${first} → ${last}`] = (routeMap[`${first} → ${last}`] || 0) + 1
     }
   })
   const topRoutes = Object.entries(routeMap).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([route, count]) => ({ route, count }))
-
   const userName = user.user_metadata?.full_name || "Driver"
 
   return (
@@ -56,15 +54,15 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total Trips", value: totalTrips.toString(), delta: null },
-          { label: "Total KM", value: totalKm.toLocaleString(), delta: null },
-          { label: "Trips This Month", value: thisMonth.length.toString(), delta: null },
-          { label: "KM This Month", value: kmThisMonth.toLocaleString(), delta: null },
+          { label: "Total Trips", value: totalTrips.toString() },
+          { label: "Total KM", value: totalKm.toLocaleString() },
+          { label: "Trips This Month", value: thisMonth.length.toString() },
+          { label: "KM This Month", value: kmThisMonth.toLocaleString() },
         ].map((stat) => (
           <div key={stat.label} className="stat-card">
-            <div className="w-5 h-[2px] bg-[#3b82f6] rounded-full mb-3"></div>
-            <div className="text-[22px] font-bold text-[#e8e8e8] tracking-tight leading-none mb-1.5">{stat.value}</div>
-            <div className="text-[10px] text-[#2e2e2e] font-medium">{stat.label}</div>
+            <div className="w-5 h-[2px] bg-[#2563eb] rounded-full mb-3"></div>
+            <div className="text-[22px] font-bold text-white tracking-tight leading-none mb-1.5">{stat.value}</div>
+            <div className="text-[10px] text-[#2a3560] font-medium">{stat.label}</div>
           </div>
         ))}
       </div>
@@ -74,12 +72,12 @@ export default async function DashboardPage() {
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="section-title mb-0">Recent Trips</h2>
-          <Link href="/history" className="text-[11px] text-[#3b82f6] hover:text-[#60a5fa]">View all →</Link>
+          <Link href="/history" className="text-[11px] text-[#2563eb] hover:text-[#60a5fa]">View all →</Link>
         </div>
         {allTrips.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-3xl mb-3">🚛</div>
-            <p className="text-[#2a2a2a] text-sm mb-4">No trips yet</p>
+            <p className="text-[#2a3560] text-sm mb-4">No trips yet</p>
             <Link href="/trip/new" className="btn-primary text-sm inline-block">Create Trip Sheet</Link>
           </div>
         ) : (
@@ -87,10 +85,10 @@ export default async function DashboardPage() {
             {[...allTrips].reverse().slice(0, 5).map((trip) => (
               <div key={trip.id} className="table-row">
                 <div>
-                  <div className="text-[12px] font-semibold text-[#ccc]">Trip {trip.trip_numbers || "—"}</div>
-                  <div className="text-[10px] text-[#2a2a2a] mt-0.5">{trip.truck_number || "—"} · {new Date(trip.created_at).toLocaleDateString("en-CA")} · {trip.stops?.length || 0} stops</div>
+                  <div className="text-[12px] font-semibold text-white">Trip {trip.trip_numbers || "—"}</div>
+                  <div className="text-[10px] text-[#1e2a50] mt-0.5">{trip.truck_number || "—"} · {new Date(trip.created_at).toLocaleDateString("en-CA")} · {trip.stops?.length || 0} stops</div>
                 </div>
-                <div className="text-[12px] font-bold text-[#3b82f6]">{trip.total_km?.toLocaleString() || 0} km</div>
+                <div className="text-[12px] font-bold text-[#60a5fa]">{trip.total_km?.toLocaleString() || 0} km</div>
               </div>
             ))}
           </div>
