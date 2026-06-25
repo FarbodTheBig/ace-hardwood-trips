@@ -9,40 +9,49 @@ interface Props {
 
 export default function DashboardCharts({ weeklyKm, topRoutes }: Props) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div className="card">
-        <h2 className="section-title">KM per Day</h2>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="glass-card">
+        <h2 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-5">KM per Day</h2>
         {weeklyKm.length === 0 ? (
-          <div className="h-44 flex items-center justify-center text-[#cbd5e1] text-sm">No data yet</div>
+          <div className="h-48 flex items-center justify-center text-white/20 text-sm">No data yet</div>
         ) : (
-          <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={weeklyKm} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e8f0f8" />
-              <XAxis dataKey="week" tick={{ fill: "#94a3b8", fontSize: 9 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "#94a3b8", fontSize: 9 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #d8e0ec", borderRadius: "8px", color: "#0f1a35", fontSize: "11px" }} cursor={{ fill: "rgba(37,99,235,0.05)" }} />
-              <Bar dataKey="km" fill="#2563eb" radius={[3, 3, 0, 0]} />
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={weeklyKm} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="week" tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#0c0c18", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", color: "#fff", fontSize: "12px" }}
+                cursor={{ fill: "rgba(99,102,241,0.08)" }}
+              />
+              <Bar dataKey="km" fill="url(#barGrad)" radius={[6, 6, 0, 0]} />
+              <defs>
+                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
             </BarChart>
           </ResponsiveContainer>
         )}
       </div>
 
-      <div className="card">
-        <h2 className="section-title">Top Routes</h2>
+      <div className="glass-card">
+        <h2 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-5">Top Routes</h2>
         {topRoutes.length === 0 ? (
-          <div className="h-44 flex items-center justify-center text-[#cbd5e1] text-sm">No data yet</div>
+          <div className="h-48 flex items-center justify-center text-white/20 text-sm">No data yet</div>
         ) : (
-          <div className="flex flex-col gap-4 mt-1">
+          <div className="space-y-4">
             {topRoutes.map((r, i) => (
               <div key={r.route} className="flex items-center gap-3">
-                <span className="text-[10px] text-[#cbd5e1] w-3">{i + 1}</span>
+                <span className="text-xs text-white/20 w-4">{i + 1}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[11px] text-[#64748b] truncate mb-1.5">{r.route}</div>
-                  <div className="h-[2px] bg-[#e2e8f0] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#2563eb] rounded-full" style={{ width: `${(r.count / (topRoutes[0]?.count || 1)) * 100}%` }} />
+                  <div className="text-sm text-white/60 truncate mb-1.5">{r.route}</div>
+                  <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${(r.count / (topRoutes[0]?.count || 1)) * 100}%`, background: "linear-gradient(90deg, #3b82f6, #6366f1)" }} />
                   </div>
                 </div>
-                <span className="text-[10px] text-[#cbd5e1] shrink-0">{r.count}×</span>
+                <span className="text-xs text-white/25 shrink-0">{r.count}×</span>
               </div>
             ))}
           </div>
