@@ -5,14 +5,14 @@
 @layer base {
   body {
     background: #0f0f0f;
-    color: #e8e8e8;
+    color: #f0f0f0;
     -webkit-font-smoothing: antialiased;
   }
 }
 
 @layer components {
   .input-field {
-    @apply w-full bg-[#1c1c1c] border border-[#333] rounded-lg px-3 py-2.5 text-sm text-[#e8e8e8] placeholder-[#444] focus:outline-none focus:border-[#3b82f6] transition-all;
+    @apply w-full bg-[#1c1c1c] border border-[#333] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#3b82f6] transition-all;
   }
 
   .btn-primary {
@@ -20,11 +20,11 @@
   }
 
   .btn-secondary {
-    @apply bg-[#1c1c1c] hover:bg-[#252525] text-[#aaa] hover:text-[#e8e8e8] font-medium px-4 py-2 rounded-lg border border-[#333] transition-all;
+    @apply bg-[#1c1c1c] hover:bg-[#252525] text-white font-medium px-4 py-2 rounded-lg border border-[#333] transition-all;
   }
 
   .btn-ghost {
-    @apply bg-transparent hover:bg-[#1c1c1c] text-[#666] hover:text-[#aaa] font-medium px-4 py-2 rounded-lg transition-all;
+    @apply bg-transparent hover:bg-[#1c1c1c] text-[#888] hover:text-white font-medium px-4 py-2 rounded-lg transition-all;
   }
 
   .card {
@@ -36,7 +36,7 @@
   }
 
   .sidebar-item {
-    @apply flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer text-[#555] hover:text-[#aaa] hover:bg-[#1c1c1c];
+    @apply flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer text-[#777] hover:text-white hover:bg-[#1c1c1c];
   }
 
   .sidebar-item-active {
@@ -48,15 +48,15 @@
   }
 
   .page-title {
-    @apply text-[16px] font-semibold text-[#f0f0f0] tracking-tight;
+    @apply text-[16px] font-semibold text-white tracking-tight;
   }
 
   .page-sub {
-    @apply text-[12px] text-[#555] mt-1;
+    @apply text-[12px] text-[#666] mt-1;
   }
 
   .section-title {
-    @apply text-[10px] font-semibold text-[#555] uppercase tracking-[0.08em] mb-3;
+    @apply text-[10px] font-semibold text-[#666] uppercase tracking-[0.08em] mb-3;
   }
 
   .table-row {
