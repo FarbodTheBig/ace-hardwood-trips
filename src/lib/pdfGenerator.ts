@@ -5,152 +5,200 @@ import { TripSheet } from "@/types"
 export function generateTripPDF(trip: TripSheet) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" })
 
-  const blue = [59, 130, 246] as [number, number, number]
-  const darkGray = [30, 30, 30] as [number, number, number]
-  const lightGray = [245, 245, 245] as [number, number, number]
+  const blue = [31, 73, 125] as [number, number, number]
+  const lightBlue = [197, 217, 241] as [number, number, number]
+  const black = [0, 0, 0] as [number, number, number]
+  const white = [255, 255, 255] as [number, number, number]
 
-  // Header bar
-  doc.setFillColor(...blue)
-  doc.rect(0, 0, 216, 28, "F")
+  const pageW = 216
+  const margin = 14
 
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(18)
+  // ── TITLE ──
   doc.setFont("helvetica", "bold")
-  doc.text("RoadLog", 14, 12)
+  doc.setFontSize(16)
+  doc.setTextColor(...black)
+  doc.text((trip.company_name || "ACE HARDWOOD INC.").toUpperCase(), pageW / 2, 18, { align: "center" })
 
+  doc.setFont("helvetica", "bold")
   doc.setFontSize(11)
-  doc.setFont("helvetica", "normal")
-  doc.text("DRIVER TRIP SHEET", 14, 21)
+  doc.setTextColor(...blue)
+  doc.text("DRIVER TRIP SHEET", pageW / 2, 25, { align: "center" })
 
-  // Company name on right side of header
-  if (trip.company_name) {
-    doc.setFontSize(10)
+  // ── INFO GRID ──
+  const infoTop = 30
+  const rowH = 8
+  const col1 = margin
+  const col2 = 52
+  const col3 = 108
+  const col4 = 148
+
+  // Draw outer border
+  doc.setDrawColor(...black)
+  doc.setLineWidth(0.4)
+  doc.rect(col1, infoTop, pageW - margin * 2, rowH * 4)
+
+  // Row lines
+  ;[1, 2, 3].forEach((i) => {
+    doc.line(col1, infoTop + rowH * i, pageW - margin, infoTop + rowH * i)
+  })
+  // Vertical dividers
+  doc.line(col2, infoTop, col2, infoTop + rowH * 4)
+  doc.line(col3, infoTop, col3, infoTop + rowH * 4)
+  doc.line(col4, infoTop, col4, infoTop + rowH * 4)
+
+  // Left label backgrounds
+  const labelBg = [220, 230, 241] as [number, number, number]
+  ;[0, 1].forEach((i) => {
+    doc.setFillColor(...labelBg)
+    doc.rect(col1, infoTop + rowH * i, col2 - col1, rowH, "F")
+  })
+
+  function infoLabel(text: string, x: number, y: number) {
     doc.setFont("helvetica", "bold")
-    doc.text(trip.company_name, 200, 16, { align: "right" })
+    doc.setFontSize(8)
+    doc.setTextColor(...black)
+    doc.text(text, x + 1.5, y + 5.5)
+  }
+  function infoValue(text: string, x: number, y: number) {
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(8.5)
+    doc.setTextColor(...black)
+    doc.text(text || "", x + 1.5, y + 5.5)
   }
 
-  // Info grid
-  const infoY = 36
-  doc.setTextColor(...darkGray)
-  doc.setFontSize(9)
+  // Row 0
+  infoLabel("Driver Name:", col1, infoTop)
+  infoValue(trip.driver_name || "", col2, infoTop)
+  infoLabel("Trip Number(s):", col3, infoTop)
+  infoValue(trip.trip_numbers || "", col4, infoTop)
 
-  const infoLeft = [
-    ["Driver Name", trip.driver_name],
-    ["Truck #", trip.truck_number],
-    ["Start KM", trip.start_km],
-    ["Total KM", trip.total_km?.toString() || "0"],
-  ]
-  const infoRight = [
-    ["Trip Number(s)", trip.trip_numbers],
-    ["Start Date/Time", trip.start_date_time],
-    ["End Date/Time", trip.end_date_time],
-    ["End KM", trip.end_km],
-    ["Total Miles", trip.total_miles?.toFixed(2) || "0"],
-  ]
+  // Row 1
+  infoLabel("Period:", col1, infoTop + rowH)
+  infoValue(`${trip.start_date || ""} – ${trip.end_date || ""}`, col2, infoTop + rowH)
+  infoLabel("Start Date:", col3, infoTop + rowH)
+  infoValue(trip.start_date || "", col4, infoTop + rowH)
 
-  infoLeft.forEach((row, i) => {
-    const y = infoY + i * 8
-    doc.setFont("helvetica", "bold")
-    doc.setTextColor(100, 100, 100)
-    doc.text(row[0] + ":", 14, y)
-    doc.setFont("helvetica", "normal")
-    doc.setTextColor(...darkGray)
-    doc.text(row[1] || "—", 45, y)
-  })
+  // Row 2 — full width KM
+  doc.setFillColor(...labelBg)
+  doc.rect(col1, infoTop + rowH * 2, col2 - col1, rowH, "F")
+  infoLabel("Start KM:", col1, infoTop + rowH * 2)
+  // right-align value
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(8.5)
+  doc.text(trip.start_km || "", col3 - 3, infoTop + rowH * 2 + 5.5, { align: "right" })
 
-  infoRight.forEach((row, i) => {
-    const y = infoY + i * 8
-    doc.setFont("helvetica", "bold")
-    doc.setTextColor(100, 100, 100)
-    doc.text(row[0] + ":", 114, y)
-    doc.setFont("helvetica", "normal")
-    doc.setTextColor(...darkGray)
-    doc.text(row[1] || "—", 155, y)
-  })
+  doc.setFillColor(...labelBg)
+  doc.rect(col3, infoTop + rowH * 2, col4 - col3, rowH, "F")
+  infoLabel("End KM:", col3, infoTop + rowH * 2)
+  doc.setFont("helvetica", "normal")
+  doc.text(trip.end_km || "", pageW - margin - 1, infoTop + rowH * 2 + 5.5, { align: "right" })
 
-  // Divider
-  doc.setDrawColor(220, 220, 220)
-  doc.line(14, infoY + 35, 200, infoY + 35)
+  // Row 3
+  doc.setFillColor(...labelBg)
+  doc.rect(col1, infoTop + rowH * 3, col2 - col1, rowH, "F")
+  infoLabel("Total KM:", col1, infoTop + rowH * 3)
+  doc.setFont("helvetica", "normal")
+  doc.text(trip.total_km?.toLocaleString() || "0", col3 - 3, infoTop + rowH * 3 + 5.5, { align: "right" })
 
-  // Stops table
-  const tableStart = infoY + 40
+  doc.setFillColor(...labelBg)
+  doc.rect(col3, infoTop + rowH * 3, col4 - col3, rowH, "F")
+  infoLabel("Total Miles:", col3, infoTop + rowH * 3)
+  doc.setFont("helvetica", "normal")
+  doc.text(trip.total_miles?.toFixed(1) || "0", pageW - margin - 1, infoTop + rowH * 3 + 5.5, { align: "right" })
+
+  // ── TRIPS TABLE ──
+  const tableTop = infoTop + rowH * 4 + 6
+
+  const trips = (trip.trips || []) as Array<{
+    date: string
+    type: string
+    starting_point: string
+    destination: string
+    trip_number: string
+    trailer_number: string
+    truck_number: string
+  }>
+
+  // Fill to minimum 15 rows
+  const minRows = 15
+  const rows = [...trips]
+  while (rows.length < minRows) {
+    rows.push({ date: "", type: "", starting_point: "", destination: "", trip_number: "", trailer_number: "", truck_number: "" })
+  }
 
   autoTable(doc, {
-    startY: tableStart,
-    head: [["Date", "Time", "Type", "Address / Location", "Trip #", "Trailer #"]],
-    body: (trip.stops || []).map((s) => [
-      s.date || "",
-      s.time || "",
-      s.type || "",
-      s.address || "",
-      s.trip_number || "",
-      s.trailer_number || "",
+    startY: tableTop,
+    head: [["Date", "Type", "Starting Point", "Destination", "Trip #", "Trailer #", "Truck #"]],
+    body: rows.map((r) => [
+      r.date || "",
+      r.type || "",
+      r.starting_point || "",
+      r.destination || "",
+      r.trip_number || "",
+      r.trailer_number || "",
+      r.truck_number || "",
     ]),
     styles: {
-      fontSize: 8.5,
-      cellPadding: 3,
-      textColor: darkGray,
-      lineColor: [220, 220, 220],
-      lineWidth: 0.2,
+      fontSize: 8,
+      cellPadding: 2.5,
+      textColor: black,
+      lineColor: black,
+      lineWidth: 0.3,
     },
     headStyles: {
       fillColor: blue,
-      textColor: [255, 255, 255],
+      textColor: white,
       fontStyle: "bold",
       fontSize: 8.5,
-    },
-    alternateRowStyles: {
-      fillColor: lightGray,
+      halign: "center",
     },
     columnStyles: {
-      0: { cellWidth: 18 },
-      1: { cellWidth: 14 },
-      2: { cellWidth: 30 },
-      3: { cellWidth: 80 },
-      4: { cellWidth: 18 },
-      5: { cellWidth: 22 },
+      0: { cellWidth: 18, halign: "center" },
+      1: { cellWidth: 34 },
+      2: { cellWidth: 38 },
+      3: { cellWidth: 38 },
+      4: { cellWidth: 14, halign: "center" },
+      5: { cellWidth: 20, halign: "center" },
+      6: { cellWidth: 24, halign: "center" },
     },
-    margin: { left: 14, right: 14 },
+    alternateRowStyles: { fillColor: [255, 255, 255] },
+    margin: { left: margin, right: margin },
   })
 
-  // Signature area
+  // ── SIGNATURE ──
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const finalY = (doc as any).lastAutoTable.finalY + 14
+  const afterTable = (doc as any).lastAutoTable.finalY + 8
 
   doc.setFont("helvetica", "bold")
   doc.setFontSize(9)
-  doc.setTextColor(100, 100, 100)
-  doc.text("Driver Signature:", 14, finalY)
+  doc.setTextColor(...black)
+  doc.text("Driver Signature:", margin, afterTable)
 
-  // Draw signature line
-  doc.setDrawColor(...blue)
-  doc.line(50, finalY, 130, finalY)
+  // Signature line
+  doc.setDrawColor(...black)
+  doc.setLineWidth(0.4)
+  doc.line(margin + 32, afterTable, margin + 90, afterTable)
 
-  // Print the actual signature text on the line
   if (trip.driver_signature) {
     doc.setFont("helvetica", "italic")
     doc.setFontSize(10)
-    doc.setTextColor(...darkGray)
-    doc.text(trip.driver_signature, 52, finalY - 1)
+    doc.text(trip.driver_signature, margin + 33, afterTable - 1)
   }
 
-  // Date
   doc.setFont("helvetica", "bold")
   doc.setFontSize(9)
-  doc.setTextColor(100, 100, 100)
-  doc.text("Date:", 140, finalY)
-  doc.setTextColor(...darkGray)
-  doc.setFont("helvetica", "normal")
-  doc.text(trip.signature_date || "", 155, finalY)
+  doc.text("Date:", margin + 100, afterTable)
+  doc.line(margin + 110, afterTable, margin + 150, afterTable)
+  if (trip.signature_date) {
+    doc.setFont("helvetica", "normal")
+    doc.text(trip.signature_date, margin + 111, afterTable - 1)
+  }
 
   // Footer
-  doc.setFontSize(7.5)
-  doc.setTextColor(160, 160, 160)
-  doc.text(
-    `Generated: ${new Date().toLocaleString("en-CA")} — RoadLog`,
-    14,
-    285
-  )
+  doc.setFontSize(7)
+  doc.setFont("helvetica", "normal")
+  doc.setTextColor(150, 150, 150)
+  doc.text(`Generated: ${new Date().toLocaleString("en-CA")} — RoadLog`, margin, 278)
 
-  doc.save(`TripSheet_${trip.trip_numbers || "export"}_${trip.driver_name || "driver"}.pdf`)
+  doc.save(`TripSheet_${trip.driver_name || "driver"}_${trip.start_date || "period"}.pdf`)
 }

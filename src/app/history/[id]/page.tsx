@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
-import TripForm from "@/components/trip/TripForm"
+import TripDetailClient from "@/components/trip/TripDetailClient"
 
 export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -9,24 +9,65 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 
-  const { data: trip } = await supabase.from("trip_sheets").select("*").eq("id", id).eq("user_id", user.id).single()
-  if (!trip) notFound()
-
-  const driverName = user.user_metadata?.full_name || user.email || "Driver"
+  const { data: sheet } = await supabase.from("trip_sheets").select("*").eq("id", id).eq("user_id", user.id).single()
+  if (!sheet) notFound()
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/history" className="btn-ghost flex items-center gap-2 text-sm">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          History
-        </Link>
+    <div className="flex flex-col gap-6">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold text-white">Trip {trip.trip_numbers || "—"}</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Saved on {new Date(trip.created_at).toLocaleDateString("en-CA", { weekday: "short", year: "numeric", month: "short", day: "numeric" })}</p>
+          <Link href="/history" className="text-[11px] text-[#94a3b8] hover:text-[#2563eb] mb-1 block">← Back to History</Link>
+          <h1 className="page-title">{sheet.company_name || "Trip Sheet"}</h1>
+          <p className="page-sub">{sheet.start_date || sheet.start_date_time} → {sheet.end_date || sheet.end_date_time} · {sheet.driver_name}</p>
         </div>
+        <TripDetailClient sheet={sheet} />
       </div>
-      <TripForm driverName={driverName} userId={user.id} initialData={trip} readOnly />
+
+      <div className="card">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: "Total KM", value: sheet.total_km?.toLocaleString() || "0" },
+            { label: "Total Miles", value: sheet.total_miles?.toFixed(1) || "0" },
+            { label: "Start KM", value: sheet.start_km || "—" },
+            { label: "End KM", value: sheet.end_km || "—" },
+          ].map((s) => (
+            <div key={s.label} className="stat-card">
+              <div className="text-[18px] font-bold text-[#0f1a35]">{s.value}</div>
+              <div className="text-[10px] text-[#94a3b8] mt-1">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="section-title">Trips</h2>
+        {(sheet.trips || []).length === 0 ? (
+          <p className="text-[#94a3b8] text-sm">No trips recorded</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#d8e0ec]">
+                  {["Date", "Type", "Starting Point", "Destination", "Trip #", "Trailer #", "Truck #"].map((h) => (
+                    <th key={h} className="text-left py-2 px-3 text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(sheet.trips || []).map((t: Record<string, string>, i: number) => (
+                  <tr key={i} className="border-b border-[#f0f4f8]">
+                    <td className="py-2.5 px-3 text-[#0f1a35] text-[12px]">{t.date}</td>
+                    <td className="py-2.5 px-3 text-[#0f1a35] text-[12px]">{t.type}</td>
+                    <td className="py-2.5 px-3 text-[#64748b] text-[12px]">{t.starting_point}</td>
+                    <td className="py-2.5 px-3 text-[#64748b] text-[12px]">{t.destination}</td>
+                    <td className="py-2.5 px-3 text-[#0f1a35] text-[12px] font-medium">{t.trip_number}</td>
+                    <td className="py-2.5 px-3 text-[#64748b] text-[12px]">{t.trailer_number}</td>
+                    <td className="py-2.5 px-3 text-[#64748b] text-[12px]">{t.truck_number}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
