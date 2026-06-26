@@ -39,24 +39,24 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">All Trips</h1>
-        <p className="text-gray-400 text-sm mt-1">{trips.length} total trip{trips.length !== 1 ? "s" : ""}</p>
+        <p className="text-[#64748b] text-sm mt-1">{trips.length} total trip{trips.length !== 1 ? "s" : ""}</p>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-        <input className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+      <div className="bg-white border border-[#d8e0ec] rounded-xl p-4">
+        <input className="w-full bg-[#f8fafc] border border-[#d8e0ec] rounded-lg px-3 py-2 text-sm text-[#0f1a35] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-red-500"
           placeholder="Search by driver, trip #, truck #..."
           value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+        <div className="bg-white border border-[#d8e0ec] rounded-xl p-12 text-center">
           <div className="text-4xl mb-3">🚛</div>
-          <p className="text-gray-400">No trips found</p>
+          <p className="text-[#64748b]">No trips found</p>
         </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((trip) => (
-            <div key={trip.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+            <div key={trip.id} className="bg-white border border-[#d8e0ec] rounded-xl overflow-hidden">
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-red-600/20 rounded-full flex items-center justify-center text-red-400 font-semibold text-xs shrink-0">
@@ -64,7 +64,7 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
                   </div>
                   <div>
                     <div className="text-white font-medium">{trip.driver_name || "—"}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-[#94a3b8]">
                       Trip {trip.trip_numbers || "—"} · {trip.truck_number || "—"} · {new Date(trip.created_at).toLocaleDateString("en-CA")}
                     </div>
                   </div>
@@ -73,11 +73,11 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
                   <span className="text-red-400 font-semibold text-sm">{trip.total_km?.toLocaleString() || 0} km</span>
                   <button
                     onClick={() => setExpandedPhotos(expandedPhotos === trip.id ? null : trip.id)}
-                    className={`text-xs px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${expandedPhotos === trip.id ? "bg-brand-500/20 text-brand-400" : "bg-gray-800 hover:bg-gray-700 text-gray-300"}`}>
+                    className={`text-xs px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${expandedPhotos === trip.id ? "bg-brand-500/20 text-brand-400" : "bg-[#f8fafc] hover:bg-gray-700 text-[#0f1a35]"}`}>
                     📷 Photos
                   </button>
                   <button onClick={() => generateTripPDF(trip)}
-                    className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1.5 rounded-lg transition-colors">
+                    className="text-xs bg-[#f8fafc] hover:bg-gray-700 text-[#0f1a35] px-2 py-1.5 rounded-lg transition-colors">
                     PDF
                   </button>
                   <button onClick={() => handleDelete(trip.id)} disabled={deleting === trip.id}
@@ -88,7 +88,7 @@ export default function AdminTripsClient({ trips: initialTrips }: { trips: Trip[
               </div>
 
               {expandedPhotos === trip.id && (
-                <div className="border-t border-gray-800 p-4">
+                <div className="border-t border-[#d8e0ec] p-4">
                   <AdminPhotoViewer tripId={trip.id} driverName={trip.driver_name || "driver"} />
                 </div>
               )}

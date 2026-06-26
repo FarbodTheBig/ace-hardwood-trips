@@ -8,7 +8,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect("/auth/login")
   const userName = user.user_metadata?.full_name || user.email || "Driver"
   return (
-    <div className="flex min-h-screen bg-[#080810]">
+    <div className="flex min-h-screen bg-[#eef2f7]">
       <Sidebar userName={userName} />
       <main className="flex-1 overflow-auto">
         <div className="max-w-6xl mx-auto px-6 py-8">

@@ -104,7 +104,7 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-4">
-        <Link href="/admin/drivers" className="text-gray-400 hover:text-white">
+        <Link href="/admin/drivers" className="text-[#64748b] hover:text-white">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </Link>
         <div className="flex items-center gap-4">
@@ -113,7 +113,7 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">{profileForm.full_name || "Unknown Driver"}</h1>
-            <p className="text-gray-400 text-sm">{profileForm.email}</p>
+            <p className="text-[#64748b] text-sm">{profileForm.email}</p>
           </div>
         </div>
       </div>
@@ -125,18 +125,18 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
           { label: "Total KM", value: totalKm.toLocaleString() },
           { label: "Active Loads", value: loads.filter(l => l.status === "assigned").length },
         ].map((s) => (
-          <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div key={s.label} className="bg-white border border-[#d8e0ec] rounded-xl p-4 text-center">
             <div className="text-2xl font-bold text-white">{s.value}</div>
-            <div className="text-xs text-gray-400 mt-1">{s.label}</div>
+            <div className="text-xs text-[#64748b] mt-1">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1">
+      <div className="flex gap-1 bg-white border border-[#d8e0ec] rounded-xl p-1">
         {tabs.map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id ? "bg-red-600 text-white" : "text-gray-400 hover:text-white"}`}>
+            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id ? "bg-red-600 text-white" : "text-[#64748b] hover:text-white"}`}>
             {tab.label}
           </button>
         ))}
@@ -146,35 +146,35 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
       {activeTab === "trips" && (
         <div className="space-y-3">
           {trips.length === 0 ? (
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center text-gray-500">No trips yet</div>
+            <div className="bg-white border border-[#d8e0ec] rounded-xl p-12 text-center text-[#94a3b8]">No trips yet</div>
           ) : trips.map((trip) => (
-            <div key={trip.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <div key={trip.id} className="bg-white border border-[#d8e0ec] rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <span className="font-semibold text-white">Trip {trip.trip_numbers || "—"}</span>
-                  <span className="text-gray-500 text-sm ml-3">{trip.truck_number || "—"}</span>
+                  <span className="text-[#94a3b8] text-sm ml-3">{trip.truck_number || "—"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <select
                     defaultValue={trip.status || "pending"}
                     onChange={(e) => handleTripStatus(trip.id!, e.target.value)}
-                    className="text-xs bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-gray-300"
+                    className="text-xs bg-[#f8fafc] border border-[#d8e0ec] rounded-lg px-2 py-1 text-[#0f1a35]"
                   >
                     <option value="pending">Pending</option>
                     <option value="reviewed">Reviewed</option>
                     <option value="approved">Approved</option>
                   </select>
-                  <button onClick={() => generateTripPDF(trip)} className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-2 py-1 rounded-lg">PDF</button>
+                  <button onClick={() => generateTripPDF(trip)} className="text-xs bg-[#f8fafc] hover:bg-gray-700 text-[#0f1a35] px-2 py-1 rounded-lg">PDF</button>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 text-xs text-gray-400">
+              <div className="grid grid-cols-3 gap-3 text-xs text-[#64748b]">
                 <div>KM: <span className="text-red-400 font-semibold">{trip.total_km?.toLocaleString()}</span></div>
                 <div>Stops: <span className="text-white">{trip.stops?.length || 0}</span></div>
                 <div>Date: <span className="text-white">{new Date(trip.created_at).toLocaleDateString("en-CA")}</span></div>
               </div>
               <div className="mt-3">
                 <input
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 placeholder-gray-600"
+                  className="w-full bg-[#f8fafc] border border-[#d8e0ec] rounded-lg px-3 py-2 text-xs text-[#0f1a35] placeholder-[#94a3b8]"
                   placeholder="Add dispatcher notes..."
                   defaultValue={trip.dispatcher_notes || ""}
                   onBlur={async (e) => {
@@ -198,10 +198,10 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
 
           {showAssignLoad && (
             <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-              <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="bg-white border border-[#d8e0ec] rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-white">Assign Load</h2>
-                  <button onClick={() => setShowAssignLoad(false)} className="text-gray-400 hover:text-white">✕</button>
+                  <button onClick={() => setShowAssignLoad(false)} className="text-[#64748b] hover:text-white">✕</button>
                 </div>
                 <form onSubmit={handleAssignLoad} className="space-y-4">
                   {[
@@ -215,13 +215,13 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
                     { label: "Notes", key: "notes", placeholder: "Any special instructions..." },
                   ].map((field) => (
                     <div key={field.key}>
-                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{field.label}</label>
+                      <label className="block text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">{field.label}</label>
                       <input className="input-field" placeholder={field.placeholder} value={loadForm[field.key as keyof typeof loadForm]}
                         onChange={(e) => setLoadForm(p => ({ ...p, [field.key]: e.target.value }))} />
                     </div>
                   ))}
                   <div className="flex gap-3 pt-2">
-                    <button type="button" onClick={() => setShowAssignLoad(false)} className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="button" onClick={() => setShowAssignLoad(false)} className="flex-1 bg-[#f8fafc] hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg">Cancel</button>
                     <button type="submit" disabled={assigningLoad} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
                       {assigningLoad ? "Assigning..." : "Assign Load"}
                     </button>
@@ -232,16 +232,16 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
           )}
 
           {loads.length === 0 ? (
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center text-gray-500">No loads assigned yet</div>
+            <div className="bg-white border border-[#d8e0ec] rounded-xl p-12 text-center text-[#94a3b8]">No loads assigned yet</div>
           ) : loads.map((load) => (
-            <div key={load.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <div key={load.id} className="bg-white border border-[#d8e0ec] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-semibold text-white">{load.title || `Load ${load.load_number}`}</span>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${load.status === "assigned" ? "bg-blue-900/30 text-blue-400" : load.status === "completed" ? "bg-green-900/30 text-green-400" : "bg-gray-800 text-gray-400"}`}>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${load.status === "assigned" ? "bg-[#eff6ff] text-[#2563eb]" : load.status === "completed" ? "bg-[#f0fdf4] text-[#16a34a]" : "bg-[#f8fafc] text-[#64748b]"}`}>
                   {load.status}
                 </span>
               </div>
-              <div className="text-xs text-gray-400 space-y-1">
+              <div className="text-xs text-[#64748b] space-y-1">
                 <div>📍 {load.pickup_address} → {load.delivery_address}</div>
                 <div>📅 Pickup: {load.pickup_date}</div>
               </div>
@@ -266,13 +266,13 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
             </button>
           </div>
           {messages.length === 0 ? (
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center text-gray-500">No messages yet</div>
+            <div className="bg-white border border-[#d8e0ec] rounded-xl p-12 text-center text-[#94a3b8]">No messages yet</div>
           ) : (
             <div className="space-y-2">
               {messages.map((msg) => (
-                <div key={msg.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <div key={msg.id} className="bg-white border border-[#d8e0ec] rounded-xl p-4">
                   <p className="text-white text-sm">{msg.message}</p>
-                  <p className="text-xs text-gray-500 mt-2">{new Date(msg.created_at).toLocaleString("en-CA")}</p>
+                  <p className="text-xs text-[#94a3b8] mt-2">{new Date(msg.created_at).toLocaleString("en-CA")}</p>
                 </div>
               ))}
             </div>
@@ -283,10 +283,10 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
       {/* Profile Tab */}
       {activeTab === "profile" && (
         <div className="space-y-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <div className="bg-white border border-[#d8e0ec] rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-white">Driver Information</h2>
-              <button onClick={() => setEditProfile(!editProfile)} className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg">
+              <button onClick={() => setEditProfile(!editProfile)} className="text-xs bg-[#f8fafc] hover:bg-gray-700 text-[#0f1a35] px-3 py-1.5 rounded-lg">
                 {editProfile ? "Cancel" : "Edit"}
               </button>
             </div>
@@ -299,7 +299,7 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
                 { label: "License #", key: "license_number" },
               ].map((field) => (
                 <div key={field.key}>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{field.label}</label>
+                  <label className="block text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">{field.label}</label>
                   {editProfile ? (
                     <input className="input-field" value={profileForm[field.key as keyof typeof profileForm]}
                       onChange={(e) => setProfileForm(p => ({ ...p, [field.key]: e.target.value }))} />
@@ -316,7 +316,7 @@ export default function DriverDetailClient({ driverId, profile, trips, messages:
             )}
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <div className="bg-white border border-[#d8e0ec] rounded-xl p-6">
             <h2 className="font-semibold text-white mb-4">Reset Password</h2>
             <div className="flex gap-3">
               <input type="password" className="flex-1 input-field" placeholder="New password (min 6 chars)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
