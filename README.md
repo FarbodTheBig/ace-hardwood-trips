@@ -1,87 +1,135 @@
-# ACE HARDWOOD — Driver Portal
+# RoadLog — Driver Trip Management Platform
 
-A full-stack web app for Ace Hardwood truck drivers to fill out trip sheets, export PDFs, and view their history and analytics.
+A full-stack SaaS web application built for truck drivers and fleet managers to digitize trip logging, document management, and dispatch operations.
 
----
-
-## Tech Stack
-- **Next.js 15** (App Router, TypeScript)
-- **Supabase** (Auth + PostgreSQL DB)
-- **Tailwind CSS** (dark theme, brand orange)
-- **Recharts** (analytics charts)
-- **jsPDF + jspdf-autotable** (PDF export)
+**Live:** [ace-hardwood-trips-livid.vercel.app](https://ace-hardwood-trips-livid.vercel.app)
 
 ---
 
-## Local Setup (Step by Step)
+## Overview
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/YOUR_USERNAME/ace-hardwood-trips.git
-cd ace-hardwood-trips
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Set up Supabase
-1. Go to https://supabase.com and create a free account
-2. Click **New Project** → give it a name (e.g. `ace-hardwood`)
-3. Once created, go to **SQL Editor** in the sidebar
-4. Copy and paste everything from `supabase-schema.sql` and click **Run**
-5. Go to **Project Settings → API**
-6. Copy your **Project URL** and **anon public** key
-
-### 4. Create your `.env.local` file
-```bash
-cp .env.local.example .env.local
-```
-Then open `.env.local` and fill in:
-```
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-### 5. Run locally
-```bash
-npm run dev
-```
-Open http://localhost:3000 — you'll be redirected to the login page.
-
----
-
-## Deploy to Vercel
-
-### 1. Push to GitHub
-```bash
-git init
-git add .
-git commit -m "initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/ace-hardwood-trips.git
-git push -u origin main
-```
-
-### 2. Deploy on Vercel
-1. Go to https://vercel.com and sign in with GitHub
-2. Click **Add New Project** → import your repo
-3. In **Environment Variables**, add:
-   - `NEXT_PUBLIC_SUPABASE_URL` = your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your Supabase anon key
-4. Click **Deploy**
-
-That's it — your app is live!
+RoadLog replaces paper-based driver trip sheets with a modern web platform. Drivers log 14-day period trip sheets, upload photos per stop, and export professional PDFs. Admins manage drivers, view all trips, assign loads, and export reports — all in real time.
 
 ---
 
 ## Features
-- ✅ Sign up / Login (Supabase Auth with email confirmation)
-- ✅ Driver dashboard with KM/week bar chart + top routes
-- ✅ New trip sheet form (dynamic stops, auto KM + miles calculation)
-- ✅ Save trip to your account history
-- ✅ Browse past trips
-- ✅ Export any trip as a clean PDF
-- ✅ Print any trip sheet
-- ✅ Driver name + company locked (can't be edited by mistake)
+
+### Driver Portal
+- **14-Day Trip Sheets** — log all trips across a pay period on one sheet
+- **Per-trip logging** — date, type, starting point, destination, trip #, trailer #, truck #
+- **Photo uploads** — POD, PTI, and other documents per stop (up to 20 files each)
+- **PDF export** — professional trip sheet matching industry standard format
+- **KM tracking** — auto-calculates total KM and miles from start/end odometer
+- **Trip history** — view and re-export all past sheets
+
+### Admin Portal
+- **Driver management** — create accounts, reset passwords, activate/deactivate drivers
+- **All trips view** — search, filter, view photos, export PDFs, delete
+- **Dispatch board** — driver status tracking and load assignment
+- **Reports** — filter by driver/truck/date, summary table, CSV export
+- **Messaging** — send notes to individual drivers
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 16 (App Router, Turbopack) |
+| Styling | Tailwind CSS |
+| Backend | Supabase (PostgreSQL + Auth + Storage) |
+| PDF Generation | jsPDF + jsPDF-AutoTable |
+| Charts | Recharts |
+| Deployment | Vercel |
+| Language | TypeScript |
+
+---
+
+## Screenshots
+
+> Driver login, dashboard, new trip sheet, admin portal
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- A [Supabase](https://supabase.com) project
+
+### Installation
+
+```bash
+git clone https://github.com/FarbodTheBig/ace-hardwood-trips.git
+cd ace-hardwood-trips
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file in the root:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+### Database Setup
+
+Run the SQL in `supabase-schema.sql` in your Supabase SQL editor to create all required tables and storage buckets.
+
+### Run Locally
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── admin/          # Admin portal pages
+│   ├── auth/           # Login & signup
+│   ├── dashboard/      # Driver dashboard
+│   ├── history/        # Trip history
+│   └── trip/           # New trip sheet
+├── components/
+│   ├── admin/          # Admin-specific components
+│   ├── dashboard/      # Charts and stats
+│   ├── trip/           # Trip form and photo upload
+│   └── ui/             # Shared UI (sidebar, navbar)
+├── lib/
+│   ├── supabase/       # Supabase client/server setup
+│   └── pdfGenerator.ts # PDF export logic
+└── types/              # TypeScript interfaces
+```
+
+---
+
+## Architecture
+
+- **Auth** — Supabase Auth with separate driver and admin roles
+- **Storage** — Supabase Storage for photo uploads organized by user/trip/stop/category
+- **RLS** — Row Level Security policies ensure drivers only access their own data
+- **PDF** — Client-side PDF generation matching industry standard trip sheet format
+- **API Routes** — Server-side admin actions (create driver, reset password) using service role key
+
+---
+
+## Author
+
+**Farbod Foroutani**  
+Computer Science @ York University (Lassonde School of Engineering)  
+[foroutani.net](https://foroutani.net) · [LinkedIn](https://linkedin.com/in/farbodforoutani)
+
+---
+
+## License
+
+MIT
