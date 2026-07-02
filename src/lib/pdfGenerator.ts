@@ -6,12 +6,13 @@ export function generateTripPDF(trip: TripSheet) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" })
 
   const blue = [31, 73, 125] as [number, number, number]
-  const lightBlue = [197, 217, 241] as [number, number, number]
-  const black = [0, 0, 0] as [number, number, number]
   const white = [255, 255, 255] as [number, number, number]
+  const black = [0, 0, 0] as [number, number, number]
+  const labelBg = [220, 230, 241] as [number, number, number]
 
   const pageW = 216
   const margin = 14
+  const rowH = 8
 
   // ── TITLE ──
   doc.setFont("helvetica", "bold")
@@ -26,132 +27,82 @@ export function generateTripPDF(trip: TripSheet) {
 
   // ── INFO GRID ──
   const infoTop = 30
-  const rowH = 8
   const col1 = margin
   const col2 = 52
-  const col3 = 108
-  const col4 = 148
+  const col3 = 114
+  const col4 = 155
 
-  // Draw outer border
+  // Outer border
   doc.setDrawColor(...black)
   doc.setLineWidth(0.4)
-  doc.rect(col1, infoTop, pageW - margin * 2, rowH * 4)
+  doc.rect(col1, infoTop, pageW - margin * 2, rowH * 3)
 
-  // Row lines
-  ;[1, 2, 3].forEach((i) => {
-    doc.line(col1, infoTop + rowH * i, pageW - margin, infoTop + rowH * i)
-  })
+  // Row dividers
+  ;[1, 2].forEach((i) => doc.line(col1, infoTop + rowH * i, pageW - margin, infoTop + rowH * i))
+
   // Vertical dividers
-  doc.line(col2, infoTop, col2, infoTop + rowH * 4)
-  doc.line(col3, infoTop, col3, infoTop + rowH * 4)
-  doc.line(col4, infoTop, col4, infoTop + rowH * 4)
+  doc.line(col2, infoTop, col2, infoTop + rowH * 3)
+  doc.line(col3, infoTop, col3, infoTop + rowH * 3)
+  doc.line(col4, infoTop, col4, infoTop + rowH * 3)
 
-  // Left label backgrounds
-  const labelBg = [220, 230, 241] as [number, number, number]
-  ;[0, 1].forEach((i) => {
+  function drawLabelBg(x: number, y: number, w: number) {
     doc.setFillColor(...labelBg)
-    doc.rect(col1, infoTop + rowH * i, col2 - col1, rowH, "F")
-  })
+    doc.rect(x, y, w, rowH, "F")
+  }
 
-  function infoLabel(text: string, x: number, y: number) {
+  function label(text: string, x: number, y: number) {
     doc.setFont("helvetica", "bold")
     doc.setFontSize(8)
     doc.setTextColor(...black)
     doc.text(text, x + 1.5, y + 5.5)
   }
-  function infoValue(text: string, x: number, y: number) {
+
+  function value(text: string, x: number, y: number) {
     doc.setFont("helvetica", "normal")
     doc.setFontSize(8.5)
     doc.setTextColor(...black)
     doc.text(text || "", x + 1.5, y + 5.5)
   }
 
-  // Row 0
-  infoLabel("Driver Name:", col1, infoTop)
-  infoValue(trip.driver_name || "", col2, infoTop)
-  infoLabel("Trip Number(s):", col3, infoTop)
-  infoValue(trip.trip_numbers || "", col4, infoTop)
+  // Row 0 — Driver Name | value | Period | value
+  drawLabelBg(col1, infoTop, col2 - col1)
+  drawLabelBg(col3, infoTop, col4 - col3)
+  label("Driver Name:", col1, infoTop)
+  value(trip.driver_name || "", col2, infoTop)
+  label("Period:", col3, infoTop)
+  value(`${trip.start_date || ""} – ${trip.end_date || ""}`, col4, infoTop)
 
-  // Row 1
-  infoLabel("Period:", col1, infoTop + rowH)
-  infoValue(`${trip.start_date || ""} – ${trip.end_date || ""}`, col2, infoTop + rowH)
-  infoLabel("Start Date:", col3, infoTop + rowH)
-  infoValue(trip.start_date || "", col4, infoTop + rowH)
+  // Row 1 — Start Postal Code | value | End Postal Code | value
+  drawLabelBg(col1, infoTop + rowH, col2 - col1)
+  drawLabelBg(col3, infoTop + rowH, col4 - col3)
+  label("Start Postal Code:", col1, infoTop + rowH)
+  value(trip.start_postal_code || "", col2, infoTop + rowH)
+  label("Dest. Postal Code:", col3, infoTop + rowH)
+  value(trip.destination_postal_code || "", col4, infoTop + rowH)
 
-  // Row 2 — full width KM
-  doc.setFillColor(...labelBg)
-  doc.rect(col1, infoTop + rowH * 2, col2 - col1, rowH, "F")
-  infoLabel("Start KM:", col1, infoTop + rowH * 2)
-  // right-align value
-  doc.setFont("helvetica", "normal")
-  doc.setFontSize(8.5)
-  doc.text(trip.start_km || "", col3 - 3, infoTop + rowH * 2 + 5.5, { align: "right" })
-
-  doc.setFillColor(...labelBg)
-  doc.rect(col3, infoTop + rowH * 2, col4 - col3, rowH, "F")
-  infoLabel("End KM:", col3, infoTop + rowH * 2)
-  doc.setFont("helvetica", "normal")
-  doc.text(trip.end_km || "", pageW - margin - 1, infoTop + rowH * 2 + 5.5, { align: "right" })
-
-  // Row 3
-  doc.setFillColor(...labelBg)
-  doc.rect(col1, infoTop + rowH * 3, col2 - col1, rowH, "F")
-  infoLabel("Total KM:", col1, infoTop + rowH * 3)
-  doc.setFont("helvetica", "normal")
-  doc.text(trip.total_km?.toLocaleString() || "0", col3 - 3, infoTop + rowH * 3 + 5.5, { align: "right" })
-
-  doc.setFillColor(...labelBg)
-  doc.rect(col3, infoTop + rowH * 3, col4 - col3, rowH, "F")
-  infoLabel("Total Miles:", col3, infoTop + rowH * 3)
-  doc.setFont("helvetica", "normal")
-  doc.text(trip.total_miles?.toFixed(1) || "0", pageW - margin - 1, infoTop + rowH * 3 + 5.5, { align: "right" })
+  // Row 2 — Trip Numbers | value (full width)
+  drawLabelBg(col1, infoTop + rowH * 2, col2 - col1)
+  label("Trip Number(s):", col1, infoTop + rowH * 2)
+  value(trip.trip_numbers || trips(trip).map((t) => t.trip_number).filter(Boolean).join(" / ") || "", col2, infoTop + rowH * 2)
 
   // ── TRIPS TABLE ──
-  const tableTop = infoTop + rowH * 4 + 6
+  const tableTop = infoTop + rowH * 3 + 6
 
-  const trips = (trip.trips || []) as Array<{
-    date: string
-    type: string
-    starting_point: string
-    destination: string
-    trip_number: string
-    trailer_number: string
-    truck_number: string
+  const rows = [...(trip.trips || [])] as Array<{
+    date: string; type: string; starting_point: string
+    destination: string; trip_number: string; trailer_number: string; truck_number: string
   }>
 
-  // Fill to minimum 15 rows
-  const minRows = 15
-  const rows = [...trips]
-  while (rows.length < minRows) {
+  while (rows.length < 15) {
     rows.push({ date: "", type: "", starting_point: "", destination: "", trip_number: "", trailer_number: "", truck_number: "" })
   }
 
   autoTable(doc, {
     startY: tableTop,
     head: [["Date", "Type", "Starting Point", "Destination", "Trip #", "Trailer #", "Truck #"]],
-    body: rows.map((r) => [
-      r.date || "",
-      r.type || "",
-      r.starting_point || "",
-      r.destination || "",
-      r.trip_number || "",
-      r.trailer_number || "",
-      r.truck_number || "",
-    ]),
-    styles: {
-      fontSize: 8,
-      cellPadding: 2.5,
-      textColor: black,
-      lineColor: black,
-      lineWidth: 0.3,
-    },
-    headStyles: {
-      fillColor: blue,
-      textColor: white,
-      fontStyle: "bold",
-      fontSize: 8.5,
-      halign: "center",
-    },
+    body: rows.map((r) => [r.date, r.type, r.starting_point, r.destination, r.trip_number, r.trailer_number, r.truck_number]),
+    styles: { fontSize: 8, cellPadding: 2.5, textColor: black, lineColor: black, lineWidth: 0.3 },
+    headStyles: { fillColor: blue, textColor: white, fontStyle: "bold", fontSize: 8.5, halign: "center" },
     columnStyles: {
       0: { cellWidth: 18, halign: "center" },
       1: { cellWidth: 34 },
@@ -161,7 +112,6 @@ export function generateTripPDF(trip: TripSheet) {
       5: { cellWidth: 20, halign: "center" },
       6: { cellWidth: 24, halign: "center" },
     },
-    alternateRowStyles: { fillColor: [255, 255, 255] },
     margin: { left: margin, right: margin },
   })
 
@@ -173,8 +123,6 @@ export function generateTripPDF(trip: TripSheet) {
   doc.setFontSize(9)
   doc.setTextColor(...black)
   doc.text("Driver Signature:", margin, afterTable)
-
-  // Signature line
   doc.setDrawColor(...black)
   doc.setLineWidth(0.4)
   doc.line(margin + 32, afterTable, margin + 90, afterTable)
@@ -194,11 +142,14 @@ export function generateTripPDF(trip: TripSheet) {
     doc.text(trip.signature_date, margin + 111, afterTable - 1)
   }
 
-  // Footer
   doc.setFontSize(7)
   doc.setFont("helvetica", "normal")
   doc.setTextColor(150, 150, 150)
   doc.text(`Generated: ${new Date().toLocaleString("en-CA")} — RoadLog`, margin, 278)
 
   doc.save(`TripSheet_${trip.driver_name || "driver"}_${trip.start_date || "period"}.pdf`)
+}
+
+function trips(trip: TripSheet) {
+  return (trip.trips || []) as Array<{ trip_number: string }>
 }

@@ -16,20 +16,21 @@ export interface TripSheet {
   driver_name: string
   start_date: string
   end_date: string
-  start_km: string
-  end_km: string
-  total_km: number
-  total_miles: number
+  start_postal_code: string
+  destination_postal_code: string
   trips: TripRow[]
   driver_signature: string
   signature_date: string
   created_at?: string
-  // legacy fields kept for backward compat
   trip_numbers?: string
   truck_number?: string
   start_date_time?: string
   end_date_time?: string
   stops?: unknown[]
+  start_km?: string
+  end_km?: string
+  total_km?: number
+  total_miles?: number
 }
 
 export interface Profile {
